@@ -3,3 +3,4 @@ RCBS.py.egg-info/
 build/
 dist/
 RCBS/input/test.ipynb
+.vscode
