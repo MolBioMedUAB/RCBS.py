@@ -2,4 +2,4 @@ RCBSpy-dev/
 RCBS.py.egg-info/
 build/
 dist/
-RCBS/test.ipynb
+RCBS/input/test.ipynb
