@@ -2,30 +2,31 @@ name:
 type: opt
 
 input_files:
-  coordinates: file_name.inpcrd
-  topology: file_name.prmtop
-  pdb: file_name.pdb
+  coordinates:
+  topology:
+  pdb:
   coords_chemsh:
-  active_atoms: file_name.act_list
+  active_atoms:
 
 
 calculation_features:
   optimiser: lbgs
   coordinates: hdlc
-  qmmm_embedding: electrostatical
+  tolerance: 0.001
   microiterative: no
-  #inner_residues:
+  inner_residues:
 
-qm_features:
+theory:
   software: turbomole
+  qmmm_embedding: electrostatic
   qm_region: qm_list
   hamiltonian: b3lyp
   electronic_configuration: closed
-  basis: 6-31G(d,p)
-  #metal: no
-  #metal_basis:
+  basis: 6-31G(d)
+  metal: fe
+  metal_basis: lanl2dz
   charge: 0
   multiplicity: 1
-  #extra:
+  extra:
 
 #source_files: yes, no # yes default. No will be used iot create chm scripts for existing files (like a scan of an optimised structure)

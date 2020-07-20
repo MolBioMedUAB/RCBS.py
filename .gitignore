@@ -4,3 +4,5 @@ build/
 dist/
 RCBS/input/test.ipynb
 .vscode
+RCBS/qmmm_setup/scan_Habs_H12A_DHA_12LOX_4313.chm
+RCBS/qmmm_setup/opt_rc_DHA_12LOX_4313.chm
