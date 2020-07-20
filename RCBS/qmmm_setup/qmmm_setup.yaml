@@ -1,0 +1,32 @@
+name:
+type: opt
+
+input_files:
+  coordinates:
+  topology:
+  pdb:
+  coords_chemsh:
+  active_atoms:
+
+
+calculation_features:
+  optimiser: lbgs
+  coordinates: hdlc
+  tolerance: 0.001
+  microiterative: no
+  inner_residues:
+
+theory:
+  software: turbomole
+  qmmm_embedding: electrostatic
+  qm_region: qm_list
+  hamiltonian: b3lyp
+  electronic_configuration: closed
+  basis: 6-31G(d)
+  metal: fe
+  metal_basis: lanl2dz
+  charge: 0
+  multiplicity: 1
+  extra:
+
+#source_files: yes, no # yes default. No will be used iot create chm scripts for existing files (like a scan of an optimised structure)
