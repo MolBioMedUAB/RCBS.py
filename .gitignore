@@ -1,1 +1,5 @@
 .vscode/
+RCBS/__pycache__
+RCBS.py.egg-info/
+build/
+hello/
