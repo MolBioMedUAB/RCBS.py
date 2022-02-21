@@ -1,5 +1,44 @@
 from ..snippets import check_folder
 
+def frame_selector(frames_boolean, bins=10, frames_per_bin=1):
+    """
+    DESCRIPTION:
+        Function for randomly select frames from a boolean list (being the index the number of the frame).
+
+    INPUT:
+        - frames_boolean: list of boolean variables that indicate if the criteria is satisfied or not. The index of the list is the number of the frame.
+        - bins:           number of partitions of the trajectory to properly distibute the selection
+        - frames_per_bin: number of frames to select per bin
+
+    OUTPUT:
+        - list of randomly selected frames
+    """
+
+    from random import choice
+
+    selected = []
+    splits = int(round(len(frames_boolean)/bins, 0))
+
+    for f in range(frames_per_bin):
+        for b in range(bins):
+            while True:
+                frame = choice(range(splits*b, splits*(b+1)))
+                try :
+                    if frames_boolean[frame] == True:
+                        break
+                    elif frames_boolean[frame] == False:
+                        continue
+
+                except IndexError:
+                    continue
+
+            selected.append(frame+1)
+
+    selected = sorted(selected)
+
+    return selected
+
+
 
 def trajectory_frame_extractor(u, frame, name='', folder='', outformat='.pdb', solvent=True):
     """
@@ -23,6 +62,9 @@ def trajectory_frame_extractor(u, frame, name='', folder='', outformat='.pdb', s
 
     if folder != '':
         check_folder(folder)
+
+    elif folder == '':
+        folder = '.'
 
 
     if isinstance(frame, list):
@@ -55,33 +97,4 @@ def trajectory_frame_extractor(u, frame, name='', folder='', outformat='.pdb', s
             file_name = folder + name
 
         structure_saver(sel, file_name, outformat)
-
-
-
-
-
-def frame_selector(frames, bins=10, frames_per_bin=1):
-    from random import choice
-
-    selected = []
-    splits = int(round(len(frames)/bins, 0))
-
-    for f in range(number_of_frames_per_bin):
-        for b in range(bins):
-            while True:
-                frame = choice(range(splits*b, splits*(b+1)))
-                try :
-                    if frames[frame] == True:
-                        break
-                    elif frames[frame] == False:
-                        continue
-
-                except IndexError:
-                    continue
-
-            selected.append(frame)
-
-    selected = sorted(selected)
-
-    return selected
 
