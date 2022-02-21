@@ -430,13 +430,13 @@ class Measurements:
         """
 
         def bool_configs_checker(bool_configs):
-        """
-        DESCRIPTION
-            Function for checking if the dictionaries containing the information about the criteria fit contain all the required information.
+            """
+            DESCRIPTION
+                Function for checking if the dictionaries containing the information about the criteria fit contain all the required information.
 
-        INPUT:
-            - List of dictionaries
-        """
+            INPUT:
+                - List of dictionaries
+            """
 
             counter = 0
             for c in bool_configs:
