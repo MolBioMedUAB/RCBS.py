@@ -45,11 +45,13 @@ class Measurements:
         """
         DESCRIPTION:
             This function outputs the minimum measured distance between the two input selections or coordinates or their combination.
+
         INPUT:
             - Name of the measurement
-            - Two selections, which can contain more than one atom.
+            - Two selections, which can contain more than one atom
+
         OUTPUT:
-            - Shorter distance between sel1 and sel2 (in ang).
+            - Shorter distance between sel1 and sel2 (in ang)
         """
 
         self.measurements.append(
@@ -81,10 +83,10 @@ class Measurements:
 
         INPUT:
             - Name of the measurement
-            - Selection of four atoms in four different AtomGroups. They have to be input with the correct order.
+            - Selection of four atoms in four different AtomGroups. They have to be input with the correct order
 
         OUTPUT:
-            - Dihedral angle between the input atoms.
+            - Dihedral angle between the input atoms
         """
 
         for sel in (sel1, sel2, sel3, sel4):
@@ -128,10 +130,10 @@ class Measurements:
                 - 360, 2pi: option for 0,360 domain. Default option
 
         INPUT:
-            - Selection of four atoms in three different AtomGroups. They have to be input with the correct order.
+            - Selection of four atoms in three different AtomGroups. They have to be input with the correct order
 
         OUTPUT:
-            - Angle between the input atoms.
+            - Angle between the input atoms
         """
 
 
@@ -171,10 +173,10 @@ class Measurements:
             - sel          -> selection of central atoms. It has to be an AtomGroup
             - sel_env      -> radius (in ang)
             - interactions -> type of interactions to be considered (all, polar, nonpolar, donorHbond, none). Custom
-                              interactions can be also analysed by passing a list of residues names.
+                              interactions can be also analysed by passing a list of residues names
 
         OUTPUT:
-            - List of dictionaries containing the name and number of all interacting residues.
+            - List of dictionaries containing the name and number of all interacting residues
         """
 
         sel_env = self.universe.select_atoms('around %s group select' % sel_env, select=sel, updating=True)
@@ -312,7 +314,18 @@ class Measurements:
 
     def run_measure(self, save_output=False, input_config=False):
         """
+        DESCRIPTION:
+            Function for runninng all the configured measurments on a given trajectory (loaded as self.universe). It can take also a configuration stored in a file instead of taking the in-situ configurated measurement.
 
+        OPTIONS:
+            - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
+            - input_config: Pseudoboolean value for loading a configuration file. It is checked in order to find missing information that may lead to errors on the runninng.
+
+        INPUT:
+            - self: containing self.universe and self.measurements (if not loading a configuration file)
+
+        OUPTUT:
+            - self.results: dictionary containing arrays of the results keyed by the given name of the configuration.
         """
 
         #results = {}
@@ -394,7 +407,7 @@ class Measurements:
     def run_boolean(self, *bool_configs, combine=True, save_output=False):
         """
         DESCRIPTION:
-            Function for checking if
+            Function for checking if the measured results satisfy the given criteria.
 
         CHECKERS:
             List of con
@@ -406,9 +419,24 @@ class Measurements:
                 ref_val2 :  # default is 0
             }
             EX: {measure_name : , measure_type : dist, mode : lim, ref_val1
+
+        INPUT:
+            - self: containing the self.results dictionary
+            - bool_configs: list of dictionaries containing the information about the criteria to apply. The 'CHECKERS' section explains the structure of the dictionaries.
+
+        OPTIONS:
+            - combine: boolean argument. If true it adds an array containing the boolean per-frame values of the combination of all the other criteria. The combination is calculated using the and logivcal operation.
+            - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
         """
 
         def bool_configs_checker(bool_configs):
+        """
+        DESCRIPTION
+            Function for checking if the dictionaries containing the information about the criteria fit contain all the required information.
+
+        INPUT:
+            - List of dictionaries
+        """
 
             counter = 0
             for c in bool_configs:
