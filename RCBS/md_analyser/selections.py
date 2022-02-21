@@ -1,4 +1,4 @@
-from .exceptions import NotEqualListsLenghtError
+from ..exceptions import NotEqualListsLenghtError
 
 def selection(u, sel_input, sel_type=None):
     """
