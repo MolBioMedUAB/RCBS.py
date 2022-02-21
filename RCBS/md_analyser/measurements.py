@@ -439,8 +439,10 @@ class Measurements:
             - bool_configs: list of dictionaries containing the information about the criteria to apply. The 'CHECKERS' section explains the structure of the dictionaries.
 
         OPTIONS:
-            - combine: boolean argument. If true it adds an array containing the boolean per-frame values of the combination of all the other criteria. The combination is calculated using the and logivcal operation.
-            - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
+            - combine: boolean argument. If true it adds an array containing the boolean per-frame values of the combination of all the other criteria.
+                    The combination is calculated using the and logivcal operation.
+            - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension
+                    means save the results in a file called as given.
         """
 
         def bool_configs_checker(bool_configs):
@@ -481,14 +483,18 @@ class Measurements:
                             continue
 
                 if 'ref_val2' not in list(c.keys()):
-                    while True:
-                        try:
-                            c['ref_val2'] = float(input('Input max (if lim mode) or central (if tol mode) value [float] for %s: ' % c['measure_name']))
-                            break
+                    if c['mode'] == 'lim':
+                        c['ref_val2'] = 0
 
-                        except ValueError:
-                            print('Input a number (int or float).')
-                            continue
+                    elif c['mode'] == 'tol':
+                        while True:
+                            try:
+                                c['ref_val2'] = float(input('Input tolerance value (val_ref2) (if tol mode) value [float] for %s: ' % c['measure_name']))
+                                break
+
+                            except ValueError:
+                                print('Input a number (int or float).')
+                                continue
 
                 counter += 1
 
@@ -498,8 +504,7 @@ class Measurements:
 
 
         for b in bool_configs:
-            if b['measure_type'] in ('ang', 'dihe'):
-                b['ref_val1'], b['ref_val2'] = list(map(lambda ang: ((ang + 360) % 360), [b['ref_val1'], b['ref_val2']]))
+
 
             if b['mode'] == 'lim':
                 if b['ref_val1'] >= b['ref_val2']:
@@ -509,13 +514,46 @@ class Measurements:
                     max_val = b['ref_val2']
                     min_val = b['ref_val1']
 
+                self.boolean[b['measure_name']] = []
+                for r in self.results[b['measure_name']]:
+                    self.boolean[b['measure_name']].append(bool(r <= max_val and r > min_val))
+
+
             elif b['mode'] == 'tol':
                 max_val = b['ref_val1'] + b['ref_val2']
                 min_val = b['ref_val1'] - b['ref_val2']
 
-            self.boolean[b['measure_name']] = []
-            for r in self.results[b['measure_name']]:
-                self.boolean[b['measure_name']].append(bool(r <= max_val and r > min_val))
+                if b['measure_type'] == 'dist':
+                    self.boolean[b['measure_name']] = []
+                    for r in self.results[b['measure_name']]:
+                        self.boolean[b['measure_name']].append(bool(r <= max_val and r > min_val))
+
+
+                elif b['measure_type'] in ('ang', 'dihe'):
+                    #max_val, min_val = list(map(lambda ang: ((ang + 360) % 360), [max_val, min_val]))
+
+                    if max_val > 360 and min_val < 360:
+                        self.boolean[b['measure_name']] = []
+                        for r in self.results[b['measure_name']]:
+                            r_ = ((r + 360) % 360)
+                            self.boolean[b['measure_name']].append(bool((r_ > min_val and r_ < 360) or (r_ > 0 and r_ < (max_val - 360))))
+
+                    elif min_val < 0 and max_val > 0:
+                        self.boolean[b['measure_name']] = []
+                        for r in self.results[b['measure_name']]:
+                            r_ = ((r + 360) % 360)
+                            self.boolean[b['measure_name']].append(bool((r_ > 0 and r_ < max_val) or (r_ > (360 + min_val) and r_ < 360)))
+
+                    elif (min_val < 0 and max_val < 0) or (min_val > 360 and max_val > 360):
+
+                        max_val, min_val = list(map(lambda ang: ((ang + 360) % 360), [max_val, min_val]))
+
+                        self.boolean[b['measure_name']] = []
+                        for r in self.results[b['measure_name']]:
+                            r_ = ((r + 360) % 360)
+                            self.boolean[b['measure_name']].append(bool(r_ <= max_val and r_ > min_val))
+
+
 
 
         if combine == True:
@@ -549,7 +587,7 @@ class Measurements:
                 print('Boolean_results saved in', save_output)
 
 
-        return self.boolean
+        return
 
 
 
