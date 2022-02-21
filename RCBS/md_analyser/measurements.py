@@ -9,6 +9,28 @@ from numpy.linalg import norm
 
 
 class Measurements:
+    """
+    DESCRIPTION:
+        Class containing all the possible analysis of a trajectory that RCBS is able to carry out. It creates a dictionary of results (self.results) containing all the results of the configurated measurements (by add_* functions) and calculated using run_measure function, and creates a dictionary of boolean values (self.boolean) containing the result of applying a certain criterium to a certain measurement.
+
+    FUNCTIONS:
+        - add_distance: measure the distance between two atoms or two groups of atoms (and return the shorter one)
+        - add_dihedral: measure the dihedral angle between four atoms
+        - add_angle:    measure the angle between three atoms
+        - add_contacts: measure the number of contacts at a given distance from a given selection of one or more atoms
+        - run_measure:  run the all the measurements previously added
+        - run_boolean:  check if the measured parameters satisfy the given criteria
+        - config_saver: save the dictionary in JSON or YAML format containing all the measurements to carry out with the run_measure function
+
+    INPUT:
+        - u: preloaded MDAnalysis' universe
+
+    OUTPUT:
+        - self.results: dictionary containing results keyed by the given name
+        - self.boolean: dictionary containing the boolean results keyed by the given name of the criteria applied to self.results
+    """
+
+
     def __init__(self, u):
         self.measurements = []
         #self.options      = []
@@ -24,6 +46,7 @@ class Measurements:
         DESCRIPTION:
             This function outputs the minimum measured distance between the two input selections or coordinates or their combination.
         INPUT:
+            - Name of the measurement
             - Two selections, which can contain more than one atom.
         OUTPUT:
             - Shorter distance between sel1 and sel2 (in ang).
@@ -57,6 +80,7 @@ class Measurements:
                 - 360, 2pi: option for 0,360 domain. Default option
 
         INPUT:
+            - Name of the measurement
             - Selection of four atoms in four different AtomGroups. They have to be input with the correct order.
 
         OUTPUT:
@@ -94,6 +118,7 @@ class Measurements:
             The input selections have to be single atoms.
 
         OPTIONS:
+            - Name of the measurement
             - units: option for selecting the output units of the dihedral
                 - degree
                 - rad
@@ -141,6 +166,7 @@ class Measurements:
             This function takes a Universe, a selection and a radius and returns the list of residues nearer than the specified radius.
 
         INPUT:
+            - Name of the measurement
             - u            -> MDAnalysis Universe
             - sel          -> selection of central atoms. It has to be an AtomGroup
             - sel_env      -> radius (in ang)
