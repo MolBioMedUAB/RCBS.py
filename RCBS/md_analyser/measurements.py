@@ -376,6 +376,20 @@ class Measurements:
 
 
 
+                elif measurement['type'] == 'contacts':
+                    names = measurement['sel'][1].resnames
+                    ids = measurement['sel'][1].resids
+
+                    dict_ = {}
+
+                    for i,n in zip(ids, names):
+                        if i not in measurement['sel'][1].residues.resindices:
+                            if str(n)[:3] in measurement['options']['interactions']:
+                                dict_[int(str(i))] = n
+
+                    self.results[measurement['name']].append(dict_)
+
+
         if save_output != False:
 
             if save_output.split('.')[-1] in ('json', 'jsn'):
@@ -396,7 +410,7 @@ class Measurements:
 
                 print('Results saved in', save_output)
 
-        return self.results
+        return
 
     #def print_results_names(self):
 
