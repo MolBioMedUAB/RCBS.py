@@ -1,7 +1,7 @@
 from MDAnalysis import Universe
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
-from ..exceptions import NotEnoughAtomsSetectedError, NotSingleAtomSelectionError
+from ..exceptions import NotEnoughAtomsSetectedError, NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction
 from numpy import min as npmin
 from numpy import array, matrix
 from numpy.linalg import norm
@@ -183,8 +183,7 @@ class Measurements:
 
         if isinstance(interactions, str):
             if interactions not in ('all', 'polar', 'nonpolar', 'donorHbond', 'none'):
-                print("This type of interaction is not described. Available interactions are: 'all', 'polar', 'nonpolar', 'donorHbond' and 'none'.")
-                return
+                raise NotExistingInteraction
 
             else :
                 if interactions == 'all':
@@ -411,12 +410,6 @@ class Measurements:
                 print('Results saved in', save_output)
 
         return
-
-    #def print_results_names(self):
-
-
-
-    #    print()
 
     def run_boolean(self, *bool_configs, combine=True, save_output=False):
         """
