@@ -1,4 +1,8 @@
 # RCBS.py
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/dynamicsUAB/RCBS.py)](https://github.com/dynamicsUAB/RCBS.py)
+[![PyPI](https://img.shields.io/pypi/v/RCBS.py)](https://pypi.org/project/RCBS.py/)
+![GitHub](https://img.shields.io/github/license/dynamicsUAB/RCBS.py)
+[![MDAnalysis](https://img.shields.io/badge/Powered%20by-MDAnalysis-lightgray.svg)](https://www.mdanalysis.org)
 
 ## Description
 RCBS.py (Reactivity of Chemical and Biochemical Systems) is a Python package that contains several scripts and functions which try to simplify the analysis of MD simulations and, from these, to prepare the system to carry out QM/MM simulations using ChemShell. MD simulations analysis has been built in top of the MDAnalysis python package.
