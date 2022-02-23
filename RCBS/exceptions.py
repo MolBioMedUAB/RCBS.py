@@ -38,3 +38,11 @@ class NotExistingInteraction(Exception):
         print("This type of interaction is not described. Available interactions are: 'all', 'polar', 'nonpolar', 'donorHbond' and 'none'. You can also add a custom list by inputing a list of residue names (in the three-letters coding)")
     pass
 
+class OutputFormatNotAvailable(Exception):
+    """
+    Raised when the format of the output file is not available.
+    """
+
+    def __init__(self):
+        print('The output format is not available. Use JSON (.json or .jsn) or YAML (.yaml or .yml) instead.')
+    pass

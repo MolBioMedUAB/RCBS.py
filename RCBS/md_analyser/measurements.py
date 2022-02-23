@@ -1,7 +1,7 @@
 from MDAnalysis import Universe
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
-from ..exceptions import NotEnoughAtomsSetectedError, NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction
+from ..exceptions import NotEnoughAtomsSetectedError, NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction, OutputFormatNotAvailable
 from numpy import min as npmin
 from numpy import array, matrix
 from numpy.linalg import norm
@@ -256,12 +256,7 @@ class Measurements:
         """
 
         if config_filename.split('.')[-1].lower() not in ('json', 'jsn', 'yaml', 'yml'):
-            print("Output format file is not available. Use '.json' or '.yaml' extensions for saving in either format.")
-            return
-
-        #dict_ = []
-        #for entry in range(len(self.measurements)):
-        #    dict_.append(self.measurements[entry])
+            raise OutputFormatNotAvailable
 
         config = []
         for l in self.measurements:
