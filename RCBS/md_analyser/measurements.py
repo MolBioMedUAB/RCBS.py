@@ -240,7 +240,7 @@ class Measurements:
 
 
 
-    def config_saver(self, config_filename):
+    def config_saver(self, config_filename, verbose=True):
         """
         DESCRIPTION:
             Function for saving the configuration of a measurement run into a file (in json or yaml format).
@@ -286,7 +286,8 @@ class Measurements:
             dump(config, f)
             f.close()
 
-            print('Configuration saved in', config_filename)
+            if verbose == True:
+                print('Configuration saved in', config_filename)
 
             del dump
 
@@ -297,7 +298,8 @@ class Measurements:
             dump(config, f)
             f.close()
 
-            print('Configuration saved in', config_filename)
+            if verbose == True:
+                print('Configuration saved in', config_filename)
 
             del dump
 
@@ -306,7 +308,7 @@ class Measurements:
 
     #def load_results():
 
-    def run_measure(self, save_output=False, input_config=False):
+    def run_measure(self, save_output=False, input_config=False, verbose=True):
         """
         DESCRIPTION:
             Function for runninng all the configured measurments on a given trajectory (loaded as self.universe). It can take also a configuration stored in a file instead of taking the in-situ configurated measurement.
@@ -392,8 +394,8 @@ class Measurements:
                 f = open(save_output, 'w')
                 dump(self.results, f)
                 f.close()
-
-                print('Results saved in', save_output)
+                if verbose == True:
+                    print('Results saved in', save_output)
 
             elif save_output.split('.')[-1] in ('yaml', 'yml'):
                 from yaml import dump
@@ -402,11 +404,12 @@ class Measurements:
                 dump(self.results, f)
                 f.close()
 
-                print('Results saved in', save_output)
+                if verbose == True:
+                    print('Results saved in', save_output)
 
         return
 
-    def run_boolean(self, *bool_configs, combine=True, save_output=False):
+    def run_boolean(self, *bool_configs, combine=True, save_output=False, verbose=True):
         """
         DESCRIPTION:
             Function for checking if the measured results satisfy the given criteria.
@@ -562,8 +565,8 @@ class Measurements:
                 f = open(save_output, 'w')
                 dump(self.boolean, f)
                 f.close()
-
-                print('Boolean results saved in', save_output)
+                if verbose == True:
+                    print('Boolean results saved in', save_output)
 
             elif save_output.split('.')[-1] in ('yaml', 'yml'):
                 from yaml import dump
@@ -572,8 +575,8 @@ class Measurements:
                 dump(self.boolean, f)
                 f.close()
 
-                print('Boolean_results saved in', save_output)
-
+                if verbose == True:
+                    print('Boolean results saved in', save_output)
 
         return
 
