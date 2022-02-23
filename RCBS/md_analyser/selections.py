@@ -3,16 +3,21 @@ from ..exceptions import NotEqualListsLenghtError
 
 def selection(u, sel_input, sel_type=None):
     """
-    This function takes an input number or name and type of selection (atom or residue or none)
-    and transforms it into an MDAnalysis selection. The input can also be a list of numbers or name
-    and it can combine both types of input by using a list of selection types (of the same lenght).
+    DESCRIPTION
+        This function takes an input number or name and type of selection (atom or residue or none) and transforms it into an MDAnalysis selection. The input can also be a list of numbers or name and it can combine both types of input by using a list of selection types (of the same lenght).
 
-    sel_type: at_num, at_name, res, none
-        at_num   -> atom number
-        at_name  -> atom name
-        res_num  -> residue number
-        res_name -> residue name
-        none     -> pipes the selection command directly
+    INPUT
+        - u: MDAnalysis' universe
+        - sel_input: int, str, list or tuple of int, or list or tuple of str
+        - sel_type: type of selection input as sel_input
+            at_num   -> atom number
+            at_name  -> atom name
+            res_num  -> residue number
+            res_name -> residue name
+            none     -> pipes the selection command directly
+
+    OUTPUT
+        - MDAnalysis selection as AtomGroup
     """
 
     if sel_type == None:
