@@ -5,3 +5,4 @@ RCBS.py.egg-info/
 build/
 hello/
 RCBS/examples/md_analyser/.ipynb_checkpoints/md_analyzer_example-checkpoint.ipynb
+dist/
