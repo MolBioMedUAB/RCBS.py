@@ -1,10 +1,8 @@
-from MDAnalysis import Universe
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
-from ..exceptions import NotEnoughAtomsSetectedError, NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction, OutputFormatNotAvailable
+from ..exceptions import NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction, OutputFormatNotAvailable
 from numpy import min as npmin
-from numpy import array, matrix
-from numpy.linalg import norm
+from numpy import array
 
 
 
@@ -33,10 +31,7 @@ class Measurements:
 
     def __init__(self, u):
         self.measurements = []
-        #self.options      = []
-        #self.type         = []
         self.universe     = u
-        #self.trajectory   = u.trajectory
         self.results      = {}
         self.boolean      = {}
 
@@ -54,16 +49,12 @@ class Measurements:
             - Shorter distance between sel1 and sel2 (in ang)
         """
 
-        self.measurements.append(
-            {
+        self.measurements.append({
                 'name'    : name,
                 'type'    : 'distance',
                 'sel'     : [sel1, sel2],
                 'options' : None,
- #               'measure' : None,
-            }
-            #npmin(mdadist.distance_array(array(sel1), array(sel2), backend='OpenMP'))
-            )
+            })
 
 
     def add_dihedral(self, name, sel1, sel2, sel3, sel4, units='degree', domain=360):
@@ -250,9 +241,6 @@ class Measurements:
 
         OUTPUT:
             - the dictionary saved in the file
-
-        TODO:
-            - [] Check what happens when selections are not AtomGroups but indices or names
         """
 
         if config_filename.split('.')[-1].lower() not in ('json', 'jsn', 'yaml', 'yml'):
@@ -306,16 +294,13 @@ class Measurements:
         return config
 
 
-    #def load_results():
-
-    def run_measure(self, save_output=False, input_config=False, verbose=True):
+    def run_measure(self, save_output=False, verbose=True):
         """
         DESCRIPTION:
             Function for runninng all the configured measurments on a given trajectory (loaded as self.universe). It can take also a configuration stored in a file instead of taking the in-situ configurated measurement.
 
         OPTIONS:
             - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
-            - input_config: Pseudoboolean value for loading a configuration file. It is checked in order to find missing information that may lead to errors on the runninng.
 
         INPUT:
             - self: containing self.universe and self.measurements (if not loading a configuration file)
@@ -324,7 +309,6 @@ class Measurements:
             - self.results: dictionary containing arrays of the results keyed by the given name of the configuration.
         """
 
-        #results = {}
         for measurement in self.measurements:
             self.results[measurement['name']] = []
 
@@ -496,7 +480,6 @@ class Measurements:
 
         for b in bool_configs:
 
-
             if b['mode'] == 'lim':
                 if b['ref_val1'] >= b['ref_val2']:
                     max_val = b['ref_val1']
@@ -543,8 +526,6 @@ class Measurements:
                         for r in self.results[b['measure_name']]:
                             r_ = ((r + 360) % 360)
                             self.boolean[b['measure_name']].append(bool(r_ <= max_val and r_ > min_val))
-
-
 
 
         if combine == True:
