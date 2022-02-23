@@ -1,0 +1,6 @@
+include versioneer.py
+include RCBS/_version.py
+include LICENSE
+include requirements.txt
+include README.txt
+
