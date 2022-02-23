@@ -14,6 +14,14 @@ This module form RCBS.py is useful for performing analysis of MD trajectories in
 
 ## Installation
 
+### Using pip
+
+```bash
+pip install RCBS.py
+```
+
+### From source code
+
 1. Clone the repository in you local machine
 
 ```bash
