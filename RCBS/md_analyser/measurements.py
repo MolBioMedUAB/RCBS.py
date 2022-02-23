@@ -1,9 +1,13 @@
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
-from ..exceptions import NotExistingInteraction, NotSingleAtomSelectionError, NotExistingInteraction, OutputFormatNotAvailable
+from ..exceptions import (
+    NotExistingInteraction,
+    NotSingleAtomSelectionError,
+    NotExistingInteraction,
+    OutputFormatNotAvailable,
+)
 from numpy import min as npmin
 from numpy import array
-
 
 
 class Measurements:
@@ -28,13 +32,11 @@ class Measurements:
         - self.boolean: dictionary containing the boolean results keyed by the given name of the criteria applied to self.results
     """
 
-
     def __init__(self, u):
         self.measurements = []
-        self.universe     = u
-        self.results      = {}
-        self.boolean      = {}
-
+        self.universe = u
+        self.results = {}
+        self.boolean = {}
 
     def add_distance(self, name, sel1, sel2):
         """
@@ -49,15 +51,16 @@ class Measurements:
             - Shorter distance between sel1 and sel2 (in ang)
         """
 
-        self.measurements.append({
-                'name'    : name,
-                'type'    : 'distance',
-                'sel'     : [sel1, sel2],
-                'options' : None,
-            })
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "distance",
+                "sel": [sel1, sel2],
+                "options": None,
+            }
+        )
 
-
-    def add_dihedral(self, name, sel1, sel2, sel3, sel4, units='degree', domain=360):
+    def add_dihedral(self, name, sel1, sel2, sel3, sel4, units="degree", domain=360):
         """
         DESCRIPTION:
             This functions measures the dihedral angle between 4 specified atoms and returns the dihedral value between 0 and 360 degrees.
@@ -87,24 +90,22 @@ class Measurements:
         units = units.lower()
         domain = str(domain).lower()
 
-        if units not in ('deg', 'degree', 'degrees', 'rad', 'radian', 'radians'):
-            units = 'degree'
+        if units not in ("deg", "degree", "degrees", "rad", "radian", "radians"):
+            units = "degree"
 
-        if domain not in (180, '180', 360, '360', 'pi', '2pi'):
-            domain = '360'
+        if domain not in (180, "180", 360, "360", "pi", "2pi"):
+            domain = "360"
 
-        self.measurements.append({
-                'name'    : name,
-                'type'    : 'dihedral',
-                'sel'     : [sel1, sel2, sel3, sel4],
-                'options' : {
-                    'units'  : units,
-                    'domain' : domain
-                }
-        })
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "dihedral",
+                "sel": [sel1, sel2, sel3, sel4],
+                "options": {"units": units, "domain": domain},
+            }
+        )
 
-
-    def add_angle(self, name, sel1, sel2, sel3, units='deg', domain=360):
+    def add_angle(self, name, sel1, sel2, sel3, units="deg", domain=360):
         """
         DESCRIPTION:
             This functions measures the angle between 3 specified atoms and returns the value between 0 and 360 degrees.
@@ -127,7 +128,6 @@ class Measurements:
             - Angle between the input atoms
         """
 
-
         for sel in (sel1, sel2, sel3):
             if len(sel) != 1:
                 raise NotSingleAtomSelectionError
@@ -135,25 +135,22 @@ class Measurements:
         units = units.lower()
         domain = str(domain).lower()
 
-        if units not in ('deg', 'degree', 'degrees', 'rad', 'radian', 'radians'):
-            units = 'degree'
+        if units not in ("deg", "degree", "degrees", "rad", "radian", "radians"):
+            units = "degree"
 
-        if domain not in (180, '180', 360, '360', 'pi', '2pi'):
-            domain = '360'
+        if domain not in (180, "180", 360, "360", "pi", "2pi"):
+            domain = "360"
 
-        self.measurements.append({
-                'name'    : name,
-                'type'    : 'angle',
-                'sel'     : [sel1, sel2, sel3],
-                'options' : {
-                    'units'  : units,
-                    'domain' : domain
-                }
-        })
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "angle",
+                "sel": [sel1, sel2, sel3],
+                "options": {"units": units, "domain": domain},
+            }
+        )
 
-
-
-    def add_contacts(self, name, sel, sel_env=3, interactions='all', include_WAT=False):
+    def add_contacts(self, name, sel, sel_env=3, interactions="all", include_WAT=False):
         """
         DESCRIPTION:
             This function takes a Universe, a selection and a radius and returns the list of residues nearer than the specified radius.
@@ -170,46 +167,98 @@ class Measurements:
             - List of dictionaries containing the name and number of all interacting residues
         """
 
-        sel_env = self.universe.select_atoms('around %s group select' % sel_env, select=sel, updating=True)
+        sel_env = self.universe.select_atoms(
+            "around %s group select" % sel_env, select=sel, updating=True
+        )
 
         if isinstance(interactions, str):
-            if interactions not in ('all', 'polar', 'nonpolar', 'donorHbond', 'none'):
+            if interactions not in ("all", "polar", "nonpolar", "donorHbond", "none"):
                 raise NotExistingInteraction
 
-            else :
-                if interactions == 'all':
+            else:
+                if interactions == "all":
                     interactions = [
-                        'ARG', 'HIS', 'HID', 'HIE', 'HIP', 'LYS',
-                        'ASP', 'GLU',
-                        'SER', 'THR', 'ASN', 'GLN',
-                        'CYS', 'SEC', 'GLY', 'PRO',
-                        'ALA', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'TYR', 'VAL'
+                        "ARG",
+                        "HIS",
+                        "HID",
+                        "HIE",
+                        "HIP",
+                        "LYS",
+                        "ASP",
+                        "GLU",
+                        "SER",
+                        "THR",
+                        "ASN",
+                        "GLN",
+                        "CYS",
+                        "SEC",
+                        "GLY",
+                        "PRO",
+                        "ALA",
+                        "ILE",
+                        "LEU",
+                        "MET",
+                        "PHE",
+                        "TRP",
+                        "TYR",
+                        "VAL",
                     ]
-                elif interactions == 'polar':
+                elif interactions == "polar":
                     interactions = [
-                        'ARG', 'HIS', 'HID', 'HIE', 'HIP', 'LYS',
-                        'ASP', 'GLU',
-                        'SER', 'THR', 'ASN', 'GLN',
-                        'CYS', 'SEC',
-                        'TYR'
+                        "ARG",
+                        "HIS",
+                        "HID",
+                        "HIE",
+                        "HIP",
+                        "LYS",
+                        "ASP",
+                        "GLU",
+                        "SER",
+                        "THR",
+                        "ASN",
+                        "GLN",
+                        "CYS",
+                        "SEC",
+                        "TYR",
                     ]
 
-                elif interactions == 'nonpolar':
+                elif interactions == "nonpolar":
                     interactions = [
-                        'CYS', 'SEC', 'GLY', 'PRO',
-                        'ALA', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'TYR', 'VAL'
+                        "CYS",
+                        "SEC",
+                        "GLY",
+                        "PRO",
+                        "ALA",
+                        "ILE",
+                        "LEU",
+                        "MET",
+                        "PHE",
+                        "TRP",
+                        "TYR",
+                        "VAL",
                     ]
 
-                elif interactions == 'donorHbond':
+                elif interactions == "donorHbond":
                     interactions = [
-                        'ARG', 'HID', 'HIE', 'HIP', 'LYS',
-                        'ASH', 'GLH',
-                        'SER', 'THR', 'ASN', 'GLN',
-                        'CYS', 'SEC', 'GLY', 'PRO',
-                        'TYR'
+                        "ARG",
+                        "HID",
+                        "HIE",
+                        "HIP",
+                        "LYS",
+                        "ASH",
+                        "GLH",
+                        "SER",
+                        "THR",
+                        "ASN",
+                        "GLN",
+                        "CYS",
+                        "SEC",
+                        "GLY",
+                        "PRO",
+                        "TYR",
                     ]
 
-                elif interactions == 'none':
+                elif interactions == "none":
                     interactions = []
 
         elif isinstance(interactions, list):
@@ -217,19 +266,18 @@ class Measurements:
             pass
 
         if include_WAT == True:
-            interactions += ['WAT']
+            interactions += ["WAT"]
 
-
-        self.measurements.append({
-                'name'    : name,
-                'type'    : 'contacts',
-                'sel'     : [sel, sel_env],
-                'options' : {
-                    'interactions' : interactions,
-                }
-        })
-
-
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "contacts",
+                "sel": [sel, sel_env],
+                "options": {
+                    "interactions": interactions,
+                },
+            }
+        )
 
     def config_saver(self, config_filename, verbose=True):
         """
@@ -243,7 +291,7 @@ class Measurements:
             - the dictionary saved in the file
         """
 
-        if config_filename.split('.')[-1].lower() not in ('json', 'jsn', 'yaml', 'yml'):
+        if config_filename.split(".")[-1].lower() not in ("json", "jsn", "yaml", "yml"):
             raise OutputFormatNotAvailable
 
         config = []
@@ -253,7 +301,7 @@ class Measurements:
         for measurement in config:
 
             sels = []
-            for s in measurement['sel']:
+            for s in measurement["sel"]:
                 if isinstance(s, AtomGroup):
                     sels.append(s.indices)
 
@@ -262,37 +310,35 @@ class Measurements:
                         for n in range(len(sels[m])):
                             sels[m][n] = int(sels[m][n] + 1)
 
-                measurement['sel'] = sels
+                measurement["sel"] = sels
 
-            measurement['sel_type'] = 'at_num'
+            measurement["sel_type"] = "at_num"
 
-
-        if config_filename.split('.')[-1].lower() in ('json', 'jsn'):
+        if config_filename.split(".")[-1].lower() in ("json", "jsn"):
             from json import dump
 
-            f = open(config_filename, 'w')
+            f = open(config_filename, "w")
             dump(config, f)
             f.close()
 
             if verbose == True:
-                print('Configuration saved in', config_filename)
+                print("Configuration saved in", config_filename)
 
             del dump
 
-        elif config_filename.split('.')[-1].lower() in ('yaml', 'yml'):
+        elif config_filename.split(".")[-1].lower() in ("yaml", "yml"):
             from yaml import dump
 
-            f = open(config_filename, 'w')
+            f = open(config_filename, "w")
             dump(config, f)
             f.close()
 
             if verbose == True:
-                print('Configuration saved in', config_filename)
+                print("Configuration saved in", config_filename)
 
             del dump
 
         return config
-
 
     def run_measure(self, save_output=False, verbose=True):
         """
@@ -310,86 +356,204 @@ class Measurements:
         """
 
         for measurement in self.measurements:
-            self.results[measurement['name']] = []
+            self.results[measurement["name"]] = []
 
         for ts in self.universe.trajectory:
 
             for measurement in self.measurements:
 
-                if measurement['type'] == 'distance':
-                    self.results[measurement['name']].append(npmin(mdadist.distance_array(array(measurement['sel'][0].positions), array(measurement['sel'][1].positions), backend='OpenMP')))
+                if measurement["type"] == "distance":
+                    self.results[measurement["name"]].append(
+                        npmin(
+                            mdadist.distance_array(
+                                array(measurement["sel"][0].positions),
+                                array(measurement["sel"][1].positions),
+                                backend="OpenMP",
+                            )
+                        )
+                    )
 
-                elif measurement['type'] == 'dihedral':
+                elif measurement["type"] == "dihedral":
 
-                    if measurement['options']['units'] in ('rad', 'radian', 'radians'):
-                        if measurement['options']['domain'] in (180, '180', 'pi'):
-                            self.results[measurement['name']].append(float(mdadist.calc_dihedrals(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, measurement['sel'][3].positions, backend='OpenMP')))
-                        elif measurement['options']['domain'] in (360, '360', '2pi'):
+                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    mdadist.calc_dihedrals(
+                                        measurement["sel"][0].positions,
+                                        measurement["sel"][1].positions,
+                                        measurement["sel"][2].positions,
+                                        measurement["sel"][3].positions,
+                                        backend="OpenMP",
+                                    )
+                                )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
                             from math import pi
-                            self.results[measurement['name']].append((float(mdadist.calc_dihedrals(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, measurement['sel'][3].positions, backend='OpenMP')) + pi) % pi)
 
-                    elif measurement['options']['units'] in ('deg', 'degree', 'degrees'):
+                            self.results[measurement["name"]].append(
+                                (
+                                    float(
+                                        mdadist.calc_dihedrals(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            measurement["sel"][3].positions,
+                                            backend="OpenMP",
+                                        )
+                                    )
+                                    + pi
+                                )
+                                % pi
+                            )
+
+                    elif measurement["options"]["units"] in (
+                        "deg",
+                        "degree",
+                        "degrees",
+                    ):
                         from numpy import rad2deg
-                        if measurement['options']['domain'] in (180, '180', 'pi'):
-                            self.results[measurement['name']].append(float(rad2deg(mdadist.calc_dihedrals(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, measurement['sel'][3].positions, backend='OpenMP'))))
-                        elif measurement['options']['domain'] in (360, '360', '2pi'):
+
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    rad2deg(
+                                        mdadist.calc_dihedrals(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            measurement["sel"][3].positions,
+                                            backend="OpenMP",
+                                        )
+                                    )
+                                )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
                             from math import pi
-                            self.results[measurement['name']].append((float(rad2deg(mdadist.calc_dihedrals(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, measurement['sel'][3].positions, backend='OpenMP'))) + 360) % 360)
 
-                elif measurement['type'] == 'angle':
+                            self.results[measurement["name"]].append(
+                                (
+                                    float(
+                                        rad2deg(
+                                            mdadist.calc_dihedrals(
+                                                measurement["sel"][0].positions,
+                                                measurement["sel"][1].positions,
+                                                measurement["sel"][2].positions,
+                                                measurement["sel"][3].positions,
+                                                backend="OpenMP",
+                                            )
+                                        )
+                                    )
+                                    + 360
+                                )
+                                % 360
+                            )
 
-                    if measurement['options']['units'] in ('rad', 'radian', 'radians'):
-                        if measurement['options']['domain'] in (180, '180', 'pi'):
-                            self.results[measurement['name']].append(float(mdadist.calc_angles(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, backend='OpenMP')))
-                        elif measurement['options']['domain'] in (360, '360', '2pi'):
+                elif measurement["type"] == "angle":
+
+                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    mdadist.calc_angles(
+                                        measurement["sel"][0].positions,
+                                        measurement["sel"][1].positions,
+                                        measurement["sel"][2].positions,
+                                        backend="OpenMP",
+                                    )
+                                )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
                             from math import pi
-                            self.results[measurement['name']].append((float(mdadist.calc_angles(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, backend='OpenMP')) + pi) % pi)
 
-                    elif measurement['options']['units'] in ('deg', 'degree', 'degrees'):
+                            self.results[measurement["name"]].append(
+                                (
+                                    float(
+                                        mdadist.calc_angles(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            backend="OpenMP",
+                                        )
+                                    )
+                                    + pi
+                                )
+                                % pi
+                            )
+
+                    elif measurement["options"]["units"] in (
+                        "deg",
+                        "degree",
+                        "degrees",
+                    ):
                         from numpy import rad2deg
 
-                        if measurement['options']['domain'] in (180, '180', 'pi'):
-                            self.results[measurement['name']].append(float(rad2deg(mdadist.calc_angles(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, backend='OpenMP'))))
-                        elif measurement['options']['domain'] in (360, '360', '2pi'):
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    rad2deg(
+                                        mdadist.calc_angles(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            backend="OpenMP",
+                                        )
+                                    )
+                                )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
                             from math import pi
-                            self.results[measurement['name']].append((float(rad2deg(mdadist.calc_angles(measurement['sel'][0].positions, measurement['sel'][1].positions, measurement['sel'][2].positions, backend='OpenMP'))) + 360) % 360)
 
+                            self.results[measurement["name"]].append(
+                                (
+                                    float(
+                                        rad2deg(
+                                            mdadist.calc_angles(
+                                                measurement["sel"][0].positions,
+                                                measurement["sel"][1].positions,
+                                                measurement["sel"][2].positions,
+                                                backend="OpenMP",
+                                            )
+                                        )
+                                    )
+                                    + 360
+                                )
+                                % 360
+                            )
 
-
-                elif measurement['type'] == 'contacts':
-                    names = measurement['sel'][1].resnames
-                    ids = measurement['sel'][1].resids
+                elif measurement["type"] == "contacts":
+                    names = measurement["sel"][1].resnames
+                    ids = measurement["sel"][1].resids
 
                     dict_ = {}
 
-                    for i,n in zip(ids, names):
-                        if i not in measurement['sel'][1].residues.resindices:
-                            if str(n)[:3] in measurement['options']['interactions']:
+                    for i, n in zip(ids, names):
+                        if i not in measurement["sel"][1].residues.resindices:
+                            if str(n)[:3] in measurement["options"]["interactions"]:
                                 dict_[int(str(i))] = n
 
-                    self.results[measurement['name']].append(dict_)
-
+                    self.results[measurement["name"]].append(dict_)
 
         if save_output != False:
 
-            if save_output.split('.')[-1] in ('json', 'jsn'):
+            if save_output.split(".")[-1] in ("json", "jsn"):
                 from json import dump
 
-                f = open(save_output, 'w')
+                f = open(save_output, "w")
                 dump(self.results, f)
                 f.close()
                 if verbose == True:
-                    print('Results saved in', save_output)
+                    print("Results saved in", save_output)
 
-            elif save_output.split('.')[-1] in ('yaml', 'yml'):
+            elif save_output.split(".")[-1] in ("yaml", "yml"):
                 from yaml import dump
 
-                f = open(save_output, 'w')
+                f = open(save_output, "w")
                 dump(self.results, f)
                 f.close()
 
                 if verbose == True:
-                    print('Results saved in', save_output)
+                    print("Results saved in", save_output)
 
         return
 
@@ -432,43 +596,53 @@ class Measurements:
             counter = 0
             for c in bool_configs:
 
-                if 'measure_name' not in list(c.keys()):
-                    c['measure_name'] = 'boolean_' + str(counter)
+                if "measure_name" not in list(c.keys()):
+                    c["measure_name"] = "boolean_" + str(counter)
 
-                if 'measure_type' not in list(c.keys()):
-                    c['measure_type'] = 'dist'
+                if "measure_type" not in list(c.keys()):
+                    c["measure_type"] = "dist"
                 else:
-                    if c['measure_type'].lower() not in ('dist', 'ang', 'dihe'):
-                        c['measure_type'] = 'dist'
+                    if c["measure_type"].lower() not in ("dist", "ang", "dihe"):
+                        c["measure_type"] = "dist"
 
-                if 'mode' not in list(c.keys()):
-                    c['mode'] = 'lim'
-                else :
-                    if c['mode'].lower() not in ('lim', 'tol'):
-                        c['mode'] = 'lim'
+                if "mode" not in list(c.keys()):
+                    c["mode"] = "lim"
+                else:
+                    if c["mode"].lower() not in ("lim", "tol"):
+                        c["mode"] = "lim"
 
-                if 'ref_val1' not in list(c.keys()):
+                if "ref_val1" not in list(c.keys()):
                     while True:
                         try:
-                            c['ref_val1'] = float(input('Input max (if lim mode) or central (if tol mode) value [float] for %s: ' % c['measure_name']))
+                            c["ref_val1"] = float(
+                                input(
+                                    "Input max (if lim mode) or central (if tol mode) value [float] for %s: "
+                                    % c["measure_name"]
+                                )
+                            )
                             break
 
                         except ValueError:
-                            print('Input a number (int or float).')
+                            print("Input a number (int or float).")
                             continue
 
-                if 'ref_val2' not in list(c.keys()):
-                    if c['mode'] == 'lim':
-                        c['ref_val2'] = 0
+                if "ref_val2" not in list(c.keys()):
+                    if c["mode"] == "lim":
+                        c["ref_val2"] = 0
 
-                    elif c['mode'] == 'tol':
+                    elif c["mode"] == "tol":
                         while True:
                             try:
-                                c['ref_val2'] = float(input('Input tolerance value (val_ref2) (if tol mode) value [float] for %s: ' % c['measure_name']))
+                                c["ref_val2"] = float(
+                                    input(
+                                        "Input tolerance value (val_ref2) (if tol mode) value [float] for %s: "
+                                        % c["measure_name"]
+                                    )
+                                )
                                 break
 
                             except ValueError:
-                                print('Input a number (int or float).')
+                                print("Input a number (int or float).")
                                 continue
 
                 counter += 1
@@ -477,99 +651,102 @@ class Measurements:
 
         bool_configs = bool_configs_checker(bool_configs)
 
-
         for b in bool_configs:
 
-            if b['mode'] == 'lim':
-                if b['ref_val1'] >= b['ref_val2']:
-                    max_val = b['ref_val1']
-                    min_val = b['ref_val2']
-                elif b['ref_val1'] < b['ref_val2']:
-                    max_val = b['ref_val2']
-                    min_val = b['ref_val1']
+            if b["mode"] == "lim":
+                if b["ref_val1"] >= b["ref_val2"]:
+                    max_val = b["ref_val1"]
+                    min_val = b["ref_val2"]
+                elif b["ref_val1"] < b["ref_val2"]:
+                    max_val = b["ref_val2"]
+                    min_val = b["ref_val1"]
 
-                self.boolean[b['measure_name']] = []
-                for r in self.results[b['measure_name']]:
-                    self.boolean[b['measure_name']].append(bool(r <= max_val and r > min_val))
+                self.boolean[b["measure_name"]] = []
+                for r in self.results[b["measure_name"]]:
+                    self.boolean[b["measure_name"]].append(
+                        bool(r <= max_val and r > min_val)
+                    )
 
+            elif b["mode"] == "tol":
+                max_val = b["ref_val1"] + b["ref_val2"]
+                min_val = b["ref_val1"] - b["ref_val2"]
 
-            elif b['mode'] == 'tol':
-                max_val = b['ref_val1'] + b['ref_val2']
-                min_val = b['ref_val1'] - b['ref_val2']
+                if b["measure_type"] == "dist":
+                    self.boolean[b["measure_name"]] = []
+                    for r in self.results[b["measure_name"]]:
+                        self.boolean[b["measure_name"]].append(
+                            bool(r <= max_val and r > min_val)
+                        )
 
-                if b['measure_type'] == 'dist':
-                    self.boolean[b['measure_name']] = []
-                    for r in self.results[b['measure_name']]:
-                        self.boolean[b['measure_name']].append(bool(r <= max_val and r > min_val))
-
-
-                elif b['measure_type'] in ('ang', 'dihe'):
-                    #max_val, min_val = list(map(lambda ang: ((ang + 360) % 360), [max_val, min_val]))
+                elif b["measure_type"] in ("ang", "dihe"):
+                    # max_val, min_val = list(map(lambda ang: ((ang + 360) % 360), [max_val, min_val]))
 
                     if max_val > 360 and min_val < 360:
-                        self.boolean[b['measure_name']] = []
-                        for r in self.results[b['measure_name']]:
-                            r_ = ((r + 360) % 360)
-                            self.boolean[b['measure_name']].append(bool((r_ > min_val and r_ < 360) or (r_ > 0 and r_ < (max_val - 360))))
+                        self.boolean[b["measure_name"]] = []
+                        for r in self.results[b["measure_name"]]:
+                            r_ = (r + 360) % 360
+                            self.boolean[b["measure_name"]].append(
+                                bool(
+                                    (r_ > min_val and r_ < 360)
+                                    or (r_ > 0 and r_ < (max_val - 360))
+                                )
+                            )
 
                     elif min_val < 0 and max_val > 0:
-                        self.boolean[b['measure_name']] = []
-                        for r in self.results[b['measure_name']]:
-                            r_ = ((r + 360) % 360)
-                            self.boolean[b['measure_name']].append(bool((r_ > 0 and r_ < max_val) or (r_ > (360 + min_val) and r_ < 360)))
+                        self.boolean[b["measure_name"]] = []
+                        for r in self.results[b["measure_name"]]:
+                            r_ = (r + 360) % 360
+                            self.boolean[b["measure_name"]].append(
+                                bool(
+                                    (r_ > 0 and r_ < max_val)
+                                    or (r_ > (360 + min_val) and r_ < 360)
+                                )
+                            )
 
-                    elif (min_val < 0 and max_val < 0) or (min_val > 360 and max_val > 360):
+                    elif (min_val < 0 and max_val < 0) or (
+                        min_val > 360 and max_val > 360
+                    ):
 
-                        max_val, min_val = list(map(lambda ang: ((ang + 360) % 360), [max_val, min_val]))
+                        max_val, min_val = list(
+                            map(lambda ang: ((ang + 360) % 360), [max_val, min_val])
+                        )
 
-                        self.boolean[b['measure_name']] = []
-                        for r in self.results[b['measure_name']]:
-                            r_ = ((r + 360) % 360)
-                            self.boolean[b['measure_name']].append(bool(r_ <= max_val and r_ > min_val))
-
+                        self.boolean[b["measure_name"]] = []
+                        for r in self.results[b["measure_name"]]:
+                            r_ = (r + 360) % 360
+                            self.boolean[b["measure_name"]].append(
+                                bool(r_ <= max_val and r_ > min_val)
+                            )
 
         if combine == True:
-            self.boolean['combination'] = []
+            self.boolean["combination"] = []
             for f in range(len(self.boolean[list(self.boolean.keys())[0]])):
 
                 boolean = True
                 for key in list(self.boolean.keys())[:-1]:
                     boolean = bool(boolean and self.boolean[key][f])
 
-                self.boolean['combination'].append(boolean)
+                self.boolean["combination"].append(boolean)
 
         if save_output != False:
 
-            if save_output.split('.')[-1] in ('json', 'jsn'):
+            if save_output.split(".")[-1] in ("json", "jsn"):
                 from json import dump
 
-                f = open(save_output, 'w')
+                f = open(save_output, "w")
                 dump(self.boolean, f)
                 f.close()
                 if verbose == True:
-                    print('Boolean results saved in', save_output)
+                    print("Boolean results saved in", save_output)
 
-            elif save_output.split('.')[-1] in ('yaml', 'yml'):
+            elif save_output.split(".")[-1] in ("yaml", "yml"):
                 from yaml import dump
 
-                f = open(save_output, 'w')
+                f = open(save_output, "w")
                 dump(self.boolean, f)
                 f.close()
 
                 if verbose == True:
-                    print('Boolean results saved in', save_output)
+                    print("Boolean results saved in", save_output)
 
         return
-
-
-
-
-
-
-
-
-
-
-
-
-

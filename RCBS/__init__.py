@@ -1,8 +1,10 @@
 from RCBS import md_analyser
-#from RCBS import qmmm_setup
+
+# from RCBS import qmmm_setup
 
 from RCBS import exceptions
 from RCBS import snippets
 
 from . import _version
-__version__ = _version.get_versions()['version']
+
+__version__ = _version.get_versions()["version"]
