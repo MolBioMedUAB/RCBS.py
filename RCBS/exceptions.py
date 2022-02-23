@@ -28,3 +28,13 @@ class  NotExistingMetalError(Exception):
     def __init__(self):
         print('The metal has no basis set available')
     pass
+
+class NotExistingInteraction(Exception):
+    """
+    Raised when the selected interactions do not exist or are not available.
+    """
+
+    def __init__(self):
+        print("This type of interaction is not described. Available interactions are: 'all', 'polar', 'nonpolar', 'donorHbond' and 'none'. You can also add a custom list by inputing a list of residue names (in the three-letters coding)")
+    pass
+
