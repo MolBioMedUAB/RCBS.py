@@ -22,10 +22,11 @@ def frame_selector(frames_boolean, bins=10, frames_per_bin=1):
 
     def choose_frame(frames_boolean, splits, b):
         frame = choice(range(splits*b, splits*(b+1)))
+        print(frame)
         try :
-            if frames_boolean == True:
+            if frames_boolean[frame] == True:
                 return frame
-            elif frames_boolean == False:
+            elif frames_boolean[frame] == False:
                 return False
 
         except IndexError:
@@ -35,13 +36,14 @@ def frame_selector(frames_boolean, bins=10, frames_per_bin=1):
     for f in range(frames_per_bin):
         for b in range(bins):
             while True:
-                frame = choose_frame(frames_boolean, splits, b)
+                frame = int(choose_frame(frames_boolean, splits, b))
+                print(frame)
                 if frame == False:
                     continue
                 else :
+                    selected.append(int(frame) + 1)
                     break
 
-            selected.append(frame + 1)
 
     selected = sorted(selected)
 
