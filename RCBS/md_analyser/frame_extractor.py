@@ -1,7 +1,14 @@
 from ..snippets import check_folder
 
 
-def frame_selector(frames_boolean, bins=10, frames_per_bin=1, bin_type='total_length', verbose=False, loop_tolerance=0.1):
+def frame_selector(
+    frames_boolean,
+    bins=10,
+    frames_per_bin=1,
+    bin_type="total_length",
+    verbose=False,
+    loop_tolerance=0.1,
+):
     """
     DESCRIPTION:
         Function for randomly select frames from a boolean list (being the index the number of the frame).
@@ -10,7 +17,7 @@ def frame_selector(frames_boolean, bins=10, frames_per_bin=1, bin_type='total_le
         - frames_boolean: list of boolean variables that indicate if the criteria is satisfied or not. The index of the list is the number of the frame.
         - bins:           number of partitions of the trajectory to properly distibute the selection
         - frames_per_bin: number of frames to select per bin
-        - bin_type:       total_length | true_lenght --> total_length takes the whole set of frames to calculate the bins, 
+        - bin_type:       total_length | true_lenght --> total_length takes the whole set of frames to calculate the bins,
                             while true_length takes only the frames with True statements for calculating the bins
         - verbose:        True prints the frame number every time it is selected
 
@@ -25,47 +32,49 @@ def frame_selector(frames_boolean, bins=10, frames_per_bin=1, bin_type='total_le
     frames = []
     for f in range(len(frames_boolean)):
         if frames_boolean[f] == True:
-            frames.append(f+1)
+            frames.append(f + 1)
         elif frames_boolean[f] == False:
             pass
 
-
-    if bin_type.lower() == 'total_length':
-        print('total_length')
+    if bin_type.lower() == "total_length":
+        print("total_length")
         splits = int(round(len(frames_boolean) / bins, 0))
 
-    elif bin_type.lower() == 'true_length':
-        print('true_length')
+    elif bin_type.lower() == "true_length":
+        print("true_length")
         splits = int(round(len(frames) / bins, 0))
 
-    else :
+    else:
         print(bin_type)
 
     for f in range(frames_per_bin):
         for b in range(bins):
             loopout = 0
             while True:
-                if loopout+1 == int(loop_tolerance*splits):
-                    print('A frame between %s and %s has not been found. No frame will be saved for this bin.' % (splits*b, splits*(b+1)))
+                if loopout + 1 == int(loop_tolerance * splits):
+                    print(
+                        "A frame between %s and %s has not been found. No frame will be saved for this bin."
+                        % (splits * b, splits * (b + 1))
+                    )
                     break
 
-                else :
-                    try :
-                        frame = choice(range(splits*b, splits*(b+1)))
-                        if bin_type == 'total_length':
+                else:
+                    try:
+                        frame = choice(range(splits * b, splits * (b + 1)))
+                        if bin_type.lower() == "total_length":
                             if frame in frames:
                                 selected.append(frame)
                                 if verbose == True:
-                                    print('The selected frame is:', frame)
+                                    print("The selected frame is:", frame)
                                 break
-                            else :
+                            else:
                                 loopout += 1
                                 continue
 
-                        elif bin_type == 'true_length':
+                        elif bin_type.lower() == "true_length":
                             selected.append(frames[frame])
                             break
-                    
+
                     except IndexError:
                         continue
 
