@@ -185,7 +185,9 @@ class Measurements:
                         "HIP",
                         "LYS",
                         "ASP",
+                        "ASH",
                         "GLU",
+                        "GLH",
                         "SER",
                         "THR",
                         "ASN",
@@ -212,7 +214,9 @@ class Measurements:
                         "HIP",
                         "LYS",
                         "ASP",
+                        "ASH",
                         "GLU",
+                        "GLH",
                         "SER",
                         "THR",
                         "ASN",
@@ -530,7 +534,7 @@ class Measurements:
                     for i, n in zip(ids, names):
                         if i not in measurement["sel"][1].residues.resindices:
                             if str(n)[:3] in measurement["options"]["interactions"]:
-                                dict_[int(str(i))] = n
+                                dict_[int(str(i+1))] = n
 
                     self.results[measurement["name"]].append(dict_)
 
