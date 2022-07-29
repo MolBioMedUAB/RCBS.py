@@ -526,15 +526,20 @@ class Measurements:
                             )
 
                 elif measurement["type"] == "contacts":
-                    names = measurement["sel"][1].resnames
-                    ids = measurement["sel"][1].resids
+                    names = list(measurement["sel"][1].resnames)
+                    ids = list(measurement["sel"][1].resids)
 
                     dict_ = {}
 
-                    for i, n in zip(ids, names):
-                        if i not in measurement["sel"][1].residues.resindices:
-                            if str(n)[:3] in measurement["options"]["interactions"]:
-                                dict_[int(str(i+1))] = n
+                    for i in range(len(ids)):
+                        if ids[i] not in measurement["sel"][0].residues.resindices:
+                            if str(names[i]) in measurement["options"]["interactions"]:
+                                dict_[int(ids[i])] = names[i]
+
+#                    for i, n in zip(ids, names):
+#                        if i not in measurement["sel"][1].residues.resindices:
+#                            if str(n)[:3] in measurement["options"]["interactions"]:
+#                                dict_[int(str(i))] = n
 
                     self.results[measurement["name"]].append(dict_)
 
