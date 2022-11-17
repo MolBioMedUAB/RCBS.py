@@ -63,3 +63,16 @@ class OutputFormatNotAvailable(Exception):
         )
 
     pass
+
+
+class NotAvailableOptionError(Exception);
+    """
+    Raised when an input option is not available.
+    """
+
+    def __init__(self):
+        print(
+                "One of the input versions is not available. Revise the documentation of the function"
+                )
+
+    pass
