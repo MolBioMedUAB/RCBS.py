@@ -65,7 +65,7 @@ class OutputFormatNotAvailable(Exception):
     pass
 
 
-class NotAvailableOptionError(Exception);
+class NotAvailableOptionError(Exception):
     """
     Raised when an input option is not available.
     """
