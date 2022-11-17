@@ -1,3 +1,4 @@
+#from asyncio import selector_events
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 from ..exceptions import (
@@ -6,6 +7,7 @@ from ..exceptions import (
     NotExistingInteraction,
     OutputFormatNotAvailable,
 )
+from .selections import selection
 from numpy import min as npmin
 from numpy import array
 
@@ -283,6 +285,41 @@ class Measurements:
             }
         )
 
+    def add_distWATbridge(self, name, sel1, sel2, sel1_env=3, sel2_env=3):
+        """
+        DESCRIPTION
+           This function takes a Universe, two selections and the size of their environments and returns the nearest bridging water between the two selections and the distance to both of them.
+
+        INPUT:
+            - Name of the measurement
+            - u            -> MDAnalysis Universe
+            - sel1         -> selection of first set of central atoms. It has to be an AtomGroup
+            - sel2         -> selection of second set of central atoms. It has to be an AtomGroup
+            - sel1_env      -> radius around the first set of central atoms (in ang)
+            - sel2_env      -> radius around the first set of central atoms (in ang)
+
+        OUTPUT:
+            - List of dictionaries containing the number of the bridging water and the smallest distance to each of the selection sets.
+        """
+
+
+        sel1_env = self.universe.select_atoms(
+            "resname WAT and around %s group select" % sel1_env, select=sel1, updating=True
+        )
+
+        sel2_env = self.universe.select_atoms(
+            "resname WAT and around %s group select" % sel2_env, select=sel2, updating=True
+        )
+
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "distWATbridge",
+                "sel": [sel1, sel2, sel1_env, sel2_env],
+                "options": None,
+            }
+        )
+
     def config_saver(self, config_filename, verbose=True):
         """
         DESCRIPTION:
@@ -542,6 +579,55 @@ class Measurements:
 #                                dict_[int(str(i))] = n
 
                     self.results[measurement["name"]].append(dict_)
+
+                elif measurement["type"] == "distWATbridge":
+                    if "WAT" not in measurement["sel"][2].resnames or "WAT" not in measurement["sel"][3].resnames: # No WAT in one or both selections' environment
+                        self.results[measurement["name"]].append([None, None, None])
+
+                    elif len(set(measurement["sel"][2].resids) & set(measurement["sel"][3].resids)) == 0: # No WAT present in both environments
+                        self.results[measurement["name"]].append([None, None, None])
+
+                    else: # WAT residues in both environments and at least one of them coincident
+                        WATs = list(set(measurement["sel"][2].resids) & set(measurement["sel"][3].resids))
+
+                        for wat in WATs:
+                            selWAT = selection(self.universe, int(wat), sel_type='res_num')
+
+                            dist1_ = npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
+                                )
+                            )
+
+                            dist2_ = npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][1].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
+                                )
+                            )
+
+                            try :
+                                if (dist1_ + dist2_) / 2 < (dist1 + dist2) / 2: # Closest WAT is the one with the shortest average distance to both of the sels
+                                    dist1, dist2 = dist1_, dist2_
+                                    closestWAT = wat
+
+                                else :
+                                    pass
+
+                            except NameError:
+                                dist1, dist2 = dist1_, dist2_
+                                closestWAT = wat
+
+                    self.results[measurement["name"]].append(
+                        [closestWAT, dist1, dist2]
+                    )
+
+                    del selWAT
+
+
 
         if save_output != False:
 
