@@ -40,7 +40,7 @@ class Measurements:
         self.results = {}
         self.boolean = {}
 
-    def add_distance(self, name, sel1, sel2):
+    def add_distance(self, name, sel1, sel2, type='min'):
         """
         DESCRIPTION:
             This function outputs the minimum measured distance between the two input selections or coordinates or their combination.
@@ -48,17 +48,20 @@ class Measurements:
         INPUT:
             - Name of the measurement
             - Two selections, which can contain more than one atom
+            - type: min [default], com (center of mass) or cog (center of geometry)
 
         OUTPUT:
             - Shorter distance between sel1 and sel2 (in ang)
         """
+        if type.lower() not in ('min', 'com', 'cog'):
+            raise NotAvailableOptionError
 
         self.measurements.append(
             {
                 "name": name,
                 "type": "distance",
                 "sel": [sel1, sel2],
-                "options": None,
+                "options": { "type" : type },
             }
         )
 
@@ -404,15 +407,38 @@ class Measurements:
             for measurement in self.measurements:
 
                 if measurement["type"] == "distance":
-                    self.results[measurement["name"]].append(
-                        npmin(
-                            mdadist.distance_array(
-                                array(measurement["sel"][0].positions),
-                                array(measurement["sel"][1].positions),
-                                backend="OpenMP",
+                    if measurement["options"]["type"] == 'min':
+                        self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(measurement["sel"][1].positions),
+                                    backend="OpenMP",
+                                )
                             )
                         )
-                    )
+
+                    elif measurement["options"]["type"] == 'com':
+                         self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].center_of_mass()),
+                                    array(measurement["sel"][1].center_of_mass()),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                    elif measurement["options"]["type"] == 'cog':
+                         self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].center_of_geometry()),
+                                    array(measurement["sel"][1].center_of_geometry()),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
 
                 elif measurement["type"] == "dihedral":
 
