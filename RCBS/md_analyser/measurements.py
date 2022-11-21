@@ -12,23 +12,6 @@ from numpy import min as npmin
 from numpy import array
 
 
-""" TO INCLUDE
-sel       = u.select_atoms('backbone')
-selref    = ref.select_atoms('backbone')
-
-rmsd_test = []
-
-for ts in u.trajectory:
-
-    rmsd_test.append(
-        rms.rmsd(
-            sel.positions - sel.center_of_mass(),
-            selref.positions - selref.center_of_mass(),
-        )        
-    )
-"""
-
-
 class Measurements:
     """
     DESCRIPTION:
