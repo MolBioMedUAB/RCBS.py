@@ -308,6 +308,7 @@ class Measurements:
         """
 
         if ref == None:
+            self.universe.trajectory[0]
             ref = sel.positions - sel.center_of_mass()
 
         else :
