@@ -7,14 +7,4 @@ hello/
 RCBS/examples/md_analyser/.ipynb_checkpoints/md_analyzer_example-checkpoint.ipynb
 dist/
 __pycache__/
-{
-	"folders": [
-		{
-			"path": "RCBS"
-		},
-		{
-			"path": "../RCBS.py.wiki"
-		}
-	],
-	"settings": {}
-}
+RCBS.code-workspace
