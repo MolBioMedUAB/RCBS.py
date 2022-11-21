@@ -1,14 +1,17 @@
 # from asyncio import selector_events
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
+import MDAnalysis.analysis.rms as rms
 from ..exceptions import (
     NotExistingInteraction,
     NotSingleAtomSelectionError,
     NotExistingInteraction,
     OutputFormatNotAvailable,
+    NotAvailableOptionError,
 )
 from .selections import selection
 from numpy import min as npmin
+from numpy import max as npmax
 from numpy import array
 
 
@@ -51,9 +54,9 @@ class Measurements:
             - type: min [default], com (center of mass) or cog (center of geometry)
 
         OUTPUT:
-            - Shorter distance between sel1 and sel2 (in ang)
+            - Shorter distance between sel1 and sel2 (in ang) or distances between COMs or COGs.
         """
-        if type.lower() not in ("min", "com", "cog"):
+        if type.lower() not in ("min", "max", "com", "cog"):
             raise NotAvailableOptionError
 
         self.measurements.append(
@@ -288,6 +291,37 @@ class Measurements:
             }
         )
 
+    def add_RMSD(self, name, sel, ref=None):
+        """
+        DESCRIPTION:
+            This function outputs the RMSD of a selection
+
+        INPUT:
+            - Name of the measurement
+            - Selection
+            - ref: selection of the reference universe. If not provided, the first frame will be used as the reference.
+
+        OUTPUT:
+            - RMSD between
+        """
+
+        if ref == None:
+            ref = sel.positions - sel.center_of_mass()
+
+        else :
+            ref = ref.positions - ref.center_of_mass()
+
+
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "rmsd",
+                "sel": sel,
+                "ref": ref,
+                "options": None,
+            }
+        )
+
     def add_distWATbridge(self, name, sel1, sel2, sel1_env=3, sel2_env=3):
         """
         DESCRIPTION
@@ -413,6 +447,17 @@ class Measurements:
                     if measurement["options"]["type"] == "min":
                         self.results[measurement["name"]].append(
                             npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(measurement["sel"][1].positions),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                    elif measurement["options"]["type"] == "max":
+                        self.results[measurement["name"]].append(
+                            npmax(
                                 mdadist.distance_array(
                                     array(measurement["sel"][0].positions),
                                     array(measurement["sel"][1].positions),
@@ -669,6 +714,15 @@ class Measurements:
                     self.results[measurement["name"]].append([closestWAT, dist1, dist2])
 
                     del selWAT
+
+                elif measurement["type"] == "rmsd":
+                    self.results[measurement["name"]].append(
+                        rms.rmsd(
+                            measurement["sel"].positions - measurement["sel"].center_of_mass(),
+                            measurement["ref"]
+                        )
+                    )
+
 
         if save_output != False:
 
