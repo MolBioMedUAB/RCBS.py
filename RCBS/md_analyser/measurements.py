@@ -301,10 +301,10 @@ class Measurements:
             - Name of the measurement
             - Selection
             - ref: selection of the reference universe. If not provided, the first frame will be used as the reference.
-            - superposition: compute the RMSD of aligned
+            - superposition [bool]: compute the RMSD of aligned
 
         OUTPUT:
-            - RMSD between
+            - Array of RMSDs of each frame against a reference
         """
 
         if ref == None:
@@ -720,12 +720,24 @@ class Measurements:
                     del selWAT
 
                 elif measurement["type"] == "rmsd":
-                    self.results[measurement["name"]].append(
-                        rms.rmsd(
-                            measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                            measurement["ref"]
+                    if measurement["options"]["superposition"] == True:
+
+                        self.results[measurement["name"]].append(
+                            rms.rmsd(
+                                measurement["sel"].positions - measurement["sel"].center_of_mass(),
+                                measurement["ref"],
+                                center=True, superposition=True
+                            )
                         )
-                    )
+
+                    elif measurement["options"]["superposition"] == False:
+
+                        self.results[measurement["name"]].append(
+                            rms.rmsd(
+                                measurement["sel"].positions - measurement["sel"].center_of_mass(),
+                                measurement["ref"]
+                            )
+                        )
 
 
         if save_output != False:
