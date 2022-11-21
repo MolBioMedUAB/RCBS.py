@@ -75,4 +75,4 @@ def selection(u, sel_input, sel_type=None, return_atomic_sel_string=False):
         return u.select_atoms(sel_string)
 
     elif return_atomic_sel_string == True:
-        return "index" + "or index".join(list(u.select_atoms(sel_string).indeces))
+        return "index" + "or index".join(list(u.select_atoms(sel_string).indices))
