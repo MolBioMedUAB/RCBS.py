@@ -307,7 +307,7 @@ class Measurements:
             - Array of RMSDs of each frame against a reference
         """
 
-        if isinstance(ref, None):
+        if isinstance(ref, type(None)):
             self.universe.trajectory[0]
             ref = sel.positions - sel.center_of_mass()
 
@@ -726,7 +726,7 @@ class Measurements:
                         self.results[measurement["name"]].append(
                             rms.rmsd(
                                 measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                                measurement["ref"] - measurement["ref"].center_of_mass(),
+                                measurement["ref"],
                                 center=True, superposition=True
                             )
                         )
@@ -736,7 +736,7 @@ class Measurements:
                         self.results[measurement["name"]].append(
                             rms.rmsd(
                                 measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                                measurement["ref"] - measurement["ref"].center_of_mass()
+                                measurement["ref"]
                             )
                         )
 
