@@ -7,8 +7,8 @@ with open("README.md", "r") as f:
 
 setup(
     name="RCBS.py",
-    version='0.0.2'
-    description="Python package useful for analysing MD trajectories and creating QM/MM models built on top of MDAnalysis. All MD formats compatible with MDAnalysis are compatible with RCBS, while QM/MM capacities are compatible with ChemShell. The aim of this package is to develop an easy-to-use way to analyse MD trajectories, while keeping a good performance.",
+    version='0.0.2',
+    description="Python package useful for analysing MD trajectories and creating QMMM models built on top of MDAnalysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Miquel Canyelles Niño",
