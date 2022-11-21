@@ -307,12 +307,13 @@ class Measurements:
             - Array of RMSDs of each frame against a reference
         """
 
-        if ref == None:
-            self.universe.trajectory[0]
-            ref = sel.positions
+        try :
+            if ref == None:
+                self.universe.trajectory[0]
+                ref = sel.positions - sel.center_of_mass()
 
-        else :
-            ref = ref.positions
+        except ValueError:
+            ref = ref.positions - ref.center_of_mass()
 
 
         self.measurements.append(
