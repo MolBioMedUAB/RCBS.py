@@ -309,10 +309,10 @@ class Measurements:
 
         if ref == None:
             self.universe.trajectory[0]
-            ref = sel.positions - sel.center_of_mass()
+            ref = sel.positions
 
         else :
-            ref = ref.positions - ref.center_of_mass()
+            ref = ref.positions
 
 
         self.measurements.append(
@@ -726,7 +726,7 @@ class Measurements:
                         self.results[measurement["name"]].append(
                             rms.rmsd(
                                 measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                                measurement["ref"],
+                                measurement["ref"] - measurement["ref"].center_of_mass(),
                                 center=True, superposition=True
                             )
                         )
@@ -736,7 +736,7 @@ class Measurements:
                         self.results[measurement["name"]].append(
                             rms.rmsd(
                                 measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                                measurement["ref"]
+                                measurement["ref"] - measurement["ref"].center_of_mass()
                             )
                         )
 
