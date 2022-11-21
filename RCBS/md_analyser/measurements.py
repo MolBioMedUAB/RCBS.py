@@ -1,4 +1,4 @@
-#from asyncio import selector_events
+# from asyncio import selector_events
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 from ..exceptions import (
@@ -40,7 +40,7 @@ class Measurements:
         self.results = {}
         self.boolean = {}
 
-    def add_distance(self, name, sel1, sel2, type='min'):
+    def add_distance(self, name, sel1, sel2, type="min"):
         """
         DESCRIPTION:
             This function outputs the minimum measured distance between the two input selections or coordinates or their combination.
@@ -53,7 +53,7 @@ class Measurements:
         OUTPUT:
             - Shorter distance between sel1 and sel2 (in ang)
         """
-        if type.lower() not in ('min', 'com', 'cog'):
+        if type.lower() not in ("min", "com", "cog"):
             raise NotAvailableOptionError
 
         self.measurements.append(
@@ -61,7 +61,7 @@ class Measurements:
                 "name": name,
                 "type": "distance",
                 "sel": [sel1, sel2],
-                "options": { "type" : type },
+                "options": {"type": type},
             }
         )
 
@@ -305,13 +305,16 @@ class Measurements:
             - List of dictionaries containing the number of the bridging water and the smallest distance to each of the selection sets.
         """
 
-
         sel1_env = self.universe.select_atoms(
-            "resname WAT and around %s group select" % sel1_env, select=sel1, updating=True
+            "resname WAT and around %s group select" % sel1_env,
+            select=sel1,
+            updating=True,
         )
 
         sel2_env = self.universe.select_atoms(
-            "resname WAT and around %s group select" % sel2_env, select=sel2, updating=True
+            "resname WAT and around %s group select" % sel2_env,
+            select=sel2,
+            updating=True,
         )
 
         self.measurements.append(
@@ -407,7 +410,7 @@ class Measurements:
             for measurement in self.measurements:
 
                 if measurement["type"] == "distance":
-                    if measurement["options"]["type"] == 'min':
+                    if measurement["options"]["type"] == "min":
                         self.results[measurement["name"]].append(
                             npmin(
                                 mdadist.distance_array(
@@ -418,8 +421,8 @@ class Measurements:
                             )
                         )
 
-                    elif measurement["options"]["type"] == 'com':
-                         self.results[measurement["name"]].append(
+                    elif measurement["options"]["type"] == "com":
+                        self.results[measurement["name"]].append(
                             npmin(
                                 mdadist.distance_array(
                                     array(measurement["sel"][0].center_of_mass()),
@@ -429,8 +432,8 @@ class Measurements:
                             )
                         )
 
-                    elif measurement["options"]["type"] == 'cog':
-                         self.results[measurement["name"]].append(
+                    elif measurement["options"]["type"] == "cog":
+                        self.results[measurement["name"]].append(
                             npmin(
                                 mdadist.distance_array(
                                     array(measurement["sel"][0].center_of_geometry()),
@@ -599,25 +602,39 @@ class Measurements:
                             if str(names[i]) in measurement["options"]["interactions"]:
                                 dict_[int(ids[i])] = names[i]
 
-#                    for i, n in zip(ids, names):
-#                        if i not in measurement["sel"][1].residues.resindices:
-#                            if str(n)[:3] in measurement["options"]["interactions"]:
-#                                dict_[int(str(i))] = n
+                    #                    for i, n in zip(ids, names):
+                    #                        if i not in measurement["sel"][1].residues.resindices:
+                    #                            if str(n)[:3] in measurement["options"]["interactions"]:
+                    #                                dict_[int(str(i))] = n
 
                     self.results[measurement["name"]].append(dict_)
 
                 elif measurement["type"] == "distWATbridge":
-                    if "WAT" not in measurement["sel"][2].resnames or "WAT" not in measurement["sel"][3].resnames: # No WAT in one or both selections' environment
+                    if (
+                        "WAT" not in measurement["sel"][2].resnames
+                        or "WAT" not in measurement["sel"][3].resnames
+                    ):  # No WAT in one or both selections' environment
                         self.results[measurement["name"]].append([None, None, None])
 
-                    elif len(set(measurement["sel"][2].resids) & set(measurement["sel"][3].resids)) == 0: # No WAT present in both environments
+                    elif (
+                        len(
+                            set(measurement["sel"][2].resids)
+                            & set(measurement["sel"][3].resids)
+                        )
+                        == 0
+                    ):  # No WAT present in both environments
                         self.results[measurement["name"]].append([None, None, None])
 
-                    else: # WAT residues in both environments and at least one of them coincident
-                        WATs = list(set(measurement["sel"][2].resids) & set(measurement["sel"][3].resids))
+                    else:  # WAT residues in both environments and at least one of them coincident
+                        WATs = list(
+                            set(measurement["sel"][2].resids)
+                            & set(measurement["sel"][3].resids)
+                        )
 
                         for wat in WATs:
-                            selWAT = selection(self.universe, int(wat), sel_type='res_num')
+                            selWAT = selection(
+                                self.universe, int(wat), sel_type="res_num"
+                            )
 
                             dist1_ = npmin(
                                 mdadist.distance_array(
@@ -635,25 +652,23 @@ class Measurements:
                                 )
                             )
 
-                            try :
-                                if (dist1_ + dist2_) / 2 < (dist1 + dist2) / 2: # Closest WAT is the one with the shortest average distance to both of the sels
+                            try:
+                                if (dist1_ + dist2_) / 2 < (
+                                    dist1 + dist2
+                                ) / 2:  # Closest WAT is the one with the shortest average distance to both of the sels
                                     dist1, dist2 = dist1_, dist2_
                                     closestWAT = wat
 
-                                else :
+                                else:
                                     pass
 
                             except NameError:
                                 dist1, dist2 = dist1_, dist2_
                                 closestWAT = wat
 
-                    self.results[measurement["name"]].append(
-                        [closestWAT, dist1, dist2]
-                    )
+                    self.results[measurement["name"]].append([closestWAT, dist1, dist2])
 
                     del selWAT
-
-
 
         if save_output != False:
 

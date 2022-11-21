@@ -72,7 +72,7 @@ class NotAvailableOptionError(Exception):
 
     def __init__(self):
         print(
-                "One of the input versions is not available. Revise the documentation of the function"
-                )
+            "One of the input versions is not available. Revise the documentation of the function"
+        )
 
     pass
