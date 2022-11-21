@@ -1,7 +1,7 @@
 from ..exceptions import NotEqualListsLenghtError
 
 
-def selection(u, sel_input, sel_type=None):
+def selection(u, sel_input, sel_type=None, return_atomic_sel_string=False):
     """
     DESCRIPTION
         This function takes an input number or name and type of selection (atom or residue or none) and transforms it into an MDAnalysis selection. The input can also be a list of numbers or name and it can combine both types of input by using a list of selection types (of the same lenght).
@@ -10,17 +10,18 @@ def selection(u, sel_input, sel_type=None):
         - u: MDAnalysis' universe
         - sel_input: int, str, list or tuple of int, or list or tuple of str
         - sel_type: type of selection input as sel_input
-            at_num   -> atom number
-            at_name  -> atom name
-            res_num  -> residue number
-            res_name -> residue name
-            none     -> pipes the selection command directly
+            at_num    -> atom number
+            at_name   -> atom name
+            res_num   -> residue number
+            res_name  -> residue name
+            none/pipe -> pipes the selection command directly
+        - return_atomic_sel_string: Returns the selection string defined by atom
 
     OUTPUT
         - MDAnalysis selection as AtomGroup
     """
 
-    if sel_type == None:
+    if sel_type == None or sel_type.lower() in ('none', 'pipe'):
         sel_string = sel_input
 
     elif isinstance(sel_input, list):
@@ -69,4 +70,9 @@ def selection(u, sel_input, sel_type=None):
         elif sel_type.lower() == "res_name":
             sel_string = " ".join(["resname", str(sel_input)])
 
-    return u.select_atoms(sel_string)
+
+    if return_atomic_sel_string == False:
+        return u.select_atoms(sel_string)
+
+    elif return_atomic_sel_string == True:
+        return "index" + "or index".join(list(u.select_atoms(sel_string).indeces))
