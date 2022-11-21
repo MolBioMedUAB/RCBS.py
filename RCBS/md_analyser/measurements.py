@@ -25,6 +25,7 @@ class Measurements:
         - add_dihedral: measure the dihedral angle between four atoms
         - add_angle:    measure the angle between three atoms
         - add_contacts: measure the number of contacts at a given distance from a given selection of one or more atoms
+        - add_RMSD:     measure the RMSD for a selection of each frame against a reference (a given structure or the first frame of the trajectory)
         - run_measure:  run the all the measurements previously added
         - run_boolean:  check if the measured parameters satisfy the given criteria
         - config_saver: save the dictionary in JSON or YAML format containing all the measurements to carry out with the run_measure function
@@ -291,7 +292,7 @@ class Measurements:
             }
         )
 
-    def add_RMSD(self, name, sel, ref=None):
+    def add_RMSD(self, name, sel, ref=None, superposition=True):
         """
         DESCRIPTION:
             This function outputs the RMSD of a selection
@@ -300,6 +301,7 @@ class Measurements:
             - Name of the measurement
             - Selection
             - ref: selection of the reference universe. If not provided, the first frame will be used as the reference.
+            - superposition: compute the RMSD of aligned
 
         OUTPUT:
             - RMSD between
@@ -318,7 +320,9 @@ class Measurements:
                 "type": "rmsd",
                 "sel": sel,
                 "ref": ref,
-                "options": None,
+                "options": {
+                    "superposition" : superposition
+                },
             }
         )
 
