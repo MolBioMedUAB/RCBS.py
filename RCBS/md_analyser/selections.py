@@ -21,7 +21,7 @@ def selection(u, sel_input, sel_type=None, return_atomic_sel_string=False):
         - MDAnalysis selection as AtomGroup
     """
 
-    if sel_type == None or sel_type.lower() in ('none', 'pipe'):
+    if sel_type == None or sel_type.lower() in ("none", "pipe"):
         sel_string = sel_input
 
     elif isinstance(sel_input, list):
@@ -69,7 +69,6 @@ def selection(u, sel_input, sel_type=None, return_atomic_sel_string=False):
             sel_string = " ".join(["resid", str(sel_input)])
         elif sel_type.lower() == "res_name":
             sel_string = " ".join(["resname", str(sel_input)])
-
 
     if return_atomic_sel_string == False:
         return u.select_atoms(sel_string)

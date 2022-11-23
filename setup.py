@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="RCBS.py",
-    version='0.1.0b',
+    version="0.1.0",
     description="Python package useful for analysing MD trajectories and creating QMMM models built on top of MDAnalysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",

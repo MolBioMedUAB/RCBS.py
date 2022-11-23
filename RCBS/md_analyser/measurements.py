@@ -314,16 +314,13 @@ class Measurements:
         elif isinstance(ref, AtomGroup):
             ref = ref.positions - ref.center_of_mass()
 
-
         self.measurements.append(
             {
                 "name": name,
                 "type": "rmsd",
                 "sel": sel,
                 "ref": ref,
-                "options": {
-                    "superposition" : superposition
-                },
+                "options": {"superposition": superposition},
             }
         )
 
@@ -725,9 +722,11 @@ class Measurements:
 
                         self.results[measurement["name"]].append(
                             rms.rmsd(
-                                measurement["sel"].positions - measurement["sel"].center_of_mass(),
+                                measurement["sel"].positions
+                                - measurement["sel"].center_of_mass(),
                                 measurement["ref"],
-                                center=True, superposition=True
+                                center=True,
+                                superposition=True,
                             )
                         )
 
@@ -735,11 +734,11 @@ class Measurements:
 
                         self.results[measurement["name"]].append(
                             rms.rmsd(
-                                measurement["sel"].positions - measurement["sel"].center_of_mass(),
-                                measurement["ref"]
+                                measurement["sel"].positions
+                                - measurement["sel"].center_of_mass(),
+                                measurement["ref"],
                             )
                         )
-
 
         if save_output != False:
 
