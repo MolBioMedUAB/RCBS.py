@@ -31,7 +31,7 @@ def selection(u, sel_input, sel_type=None, return_atomic_sel_string=False):
             elif sel_type.lower() == "at_name":
                 sel_string = "name " + " or name ".join(sel_input)
             elif sel_type.lower() == "res_num":
-                sel_string = "resid " + " or resid ".join(sel_input)
+                sel_string = "resid " + " or resid ".join(str(at) for at in sel_input)
             elif sel_type.lower() == "res_name":
                 sel_string = "resname " + " or resname ".join(sel_input)
             else:
