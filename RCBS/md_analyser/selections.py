@@ -1,7 +1,9 @@
-#from ..exceptions import NotEqualListsLenghtError
+# from ..exceptions import NotEqualListsLenghtError
 
 
-def selection(u, sel_input, sel_type=None, no_backbone=False, return_atomic_sel_string=False):
+def selection(
+    u, sel_input, sel_type=None, no_backbone=False, return_atomic_sel_string=False
+):
     """
     DESCRIPTION
         This function takes an input number or name and type of selection (atom or residue or none) and transforms it into an MDAnalysis selection. The input can also be a list of numbers or name and it can combine both types of input by using a list of selection types (of the same lenght).
@@ -40,7 +42,7 @@ def selection(u, sel_input, sel_type=None, no_backbone=False, return_atomic_sel_
 
         elif isinstance(sel_type, list):
             if len(sel_input) != len(sel_type):
-                pass#raise NotEqualListsLenghtError
+                pass  # raise NotEqualListsLenghtError
 
             else:
                 sel_string = ""
@@ -72,12 +74,13 @@ def selection(u, sel_input, sel_type=None, no_backbone=False, return_atomic_sel_
             sel_string = " ".join(["resname", str(sel_input)])
 
     if no_backbone == True:
-        sel_string = sel_string + ' and not (name H or name N or name CA or name HA or name C or name O or name OXT or name H1 or name H2 or name H3)'
+        sel_string = (
+            sel_string
+            + " and not (name H or name N or name CA or name HA or name C or name O or name OXT or name H1 or name H2 or name H3)"
+        )
 
     if return_atomic_sel_string == False:
         return u.select_atoms(sel_string)
 
     elif return_atomic_sel_string == True:
         return "index " + " or index ".join(list(u.select_atoms(sel_string).indices))
-
-
