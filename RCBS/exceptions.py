@@ -1,6 +1,14 @@
 class NotSingleAtomSelectionError(Exception):
     """
-    Raised when the input selection is not a single atom
+    Raised when the input selection is not a single atom.
+    """
+
+    pass
+
+
+class NotThreeAtomsSelectionError(Exception):
+    """
+    Raised when the input selection does not contain three atoms.
     """
 
     pass
@@ -8,7 +16,7 @@ class NotSingleAtomSelectionError(Exception):
 
 class NotEqualListsLenghtError(Exception):
     """
-    Raised when the 'sel_input' and the 'sel_types' list are not equal
+    Raised when the 'sel_input' and the 'sel_types' list are not equal.
     """
 
     def __init__(self):
