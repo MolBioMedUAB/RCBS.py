@@ -8,11 +8,14 @@ from ..exceptions import (
     NotExistingInteraction,
     OutputFormatNotAvailable,
     NotAvailableOptionError,
+    NotThreeAtomsSelectionError,
 )
 from .selections import selection
+from .calculators import planar_angle
 from numpy import min as npmin
 from numpy import max as npmax
 from numpy import array
+
 
 
 class Measurements:
@@ -155,6 +158,51 @@ class Measurements:
                 "name": name,
                 "type": "angle",
                 "sel": [sel1, sel2, sel3],
+                "options": {"units": units, "domain": domain},
+            }
+        )
+
+    def add_planar_angle(self, name, sel1, sel2, units="deg", domain=360):
+        """
+        DESCRIPTION:
+            This function measures the angle between two planes specified by three atoms each one and returns the angle.
+            The input selections have to contain three atoms.
+
+        OPTIONS:
+            - Name of the measurement
+            - units: option for selecting the output units of the dihedral
+                - degree
+                - rad
+
+            - domain: option for specifying the domain of the output measures
+                - 180, pi: option for -180,180 domain
+                - 360, 2pi: option for 0,360 domain. Default option
+
+        INPUT:
+            - Selection of two sets of three atoms in two different AtomGroups.
+
+        OUTPUT:
+            - Angle between the input atoms
+        """
+
+        for sel in (sel1, sel2):
+            if len(sel) != 3:
+                raise NotThreeAtomsSelectionError
+
+        units = units.lower()
+        domain = str(domain).lower()
+
+        if units not in ("deg", "degree", "degrees", "rad", "radian", "radians"):
+            units = "degree"
+
+        if domain not in (180, "180", 360, "360", "pi", "2pi"):
+            domain = "360"
+
+        self.measurements.append(
+            {
+                "name": name,
+                "type": "planar_angle",
+                "sel": [sel1, sel2],
                 "options": {"units": units, "domain": domain},
             }
         )
@@ -637,6 +685,18 @@ class Measurements:
                                 )
                                 % 360
                             )
+
+                elif measurement["type"] == "planar_angle":
+
+                    self.results[measurement["name"]].append(
+                        planar_angle(
+                            plane_A=measurement["sel"][0].positions,
+                            plane_B=measurement["sel"][1].positions,
+                            units=measurement["options"]["units"],
+                            domain=measurement["options"]["domain"]
+                        )
+                    )
+
 
                 elif measurement["type"] == "contacts":
                     names = list(measurement["sel"][1].resnames)
