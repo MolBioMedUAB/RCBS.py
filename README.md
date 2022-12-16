@@ -26,8 +26,11 @@ pip install RCBS.py
 ### From source code
 
 1. Clone the repository in you local machine
+
     ```git clone https://github.com/dynamicsUAB/RCBS.py.git```
 2. Move to the folder
+
     ```cd RCBS.py```
 3. Install the package using pip or pip3
+
     ```pip install RCBS.py```
