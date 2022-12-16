@@ -16,7 +16,8 @@ def build_plane(
         a, b, c = cross(v1, v2)
         d = dot([a, b, c], positions[2])
 
-        return array(a, b, c, d)
+#        return array(a, b, c, d)
+        return [a, b, c, d]
 
 
 def planar_angle(
@@ -27,10 +28,12 @@ def planar_angle(
 ):
     from numpy import arccos, absolute, sqrt
 
-    ang = arccos(absolute(
-        (plane_A[0]*plane_B[0] + plane_A[1]*plane_B[1] + plane_A[2]*plane_B[2]) /
-        (sqrt(plane_A[0]**2 + plane_A[1]**2 + plane_A[2]**2)*sqrt(plane_B[0]**2 + plane_B[1]**2 + plane_B[2]**2))
-    ))
+    plane_A = build_plane(plane_A)
+    plane_B = build_plane(plane_B)
+
+    ang = arccos(
+        (plane_A[0]*plane_B[0] + plane_A[1]*plane_B[1] + plane_A[2]*plane_B[2])/(sqrt(plane_A[0]**2 + plane_A[1]**2 + plane_A[2]**2)*sqrt(plane_B[0]**2 + plane_B[1]**2 + plane_B[2]**2))
+    )
 
     if units in ("rad", "radian", "radians"):
 
