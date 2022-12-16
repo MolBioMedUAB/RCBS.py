@@ -1,3 +1,4 @@
 MDAnalysis
 pyyaml
 numpy
+progress

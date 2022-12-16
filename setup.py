@@ -14,7 +14,7 @@ setup(
     author_mail="mcanyellesnino@gmail.com",
     packages=find_packages(),
     include_package_data=True,
-    install_requires=["numpy", "pyyaml", "MDAnalysis"],
+    install_requires=["numpy", "pyyaml", "MDAnalysis", "progress"],
     keywords="biochemistry, simulations, MDAnalysis, molecular dynamics",
     url="https://github.com/dynamicsUAB/RCBS.py",
     download_url="https://github.com/dynamicsUAB/RCBS.py/archive/refs/tags/0.1.2.tar.gz",
