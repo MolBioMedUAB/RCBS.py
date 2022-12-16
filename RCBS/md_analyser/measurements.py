@@ -16,22 +16,21 @@ from numpy import min as npmin
 from numpy import max as npmax
 from numpy import array
 
-
-
 class Measurements:
     """
     DESCRIPTION:
         Class containing all the possible analysis of a trajectory that RCBS is able to carry out. It creates a dictionary of results (self.results) containing all the results of the configurated measurements (by add_* functions) and calculated using run_measure function, and creates a dictionary of boolean values (self.boolean) containing the result of applying a certain criterium to a certain measurement.
 
     FUNCTIONS:
-        - add_distance: measure the distance between two atoms or two groups of atoms (and return the shorter one)
-        - add_dihedral: measure the dihedral angle between four atoms
-        - add_angle:    measure the angle between three atoms
-        - add_contacts: measure the number of contacts at a given distance from a given selection of one or more atoms
-        - add_RMSD:     measure the RMSD for a selection of each frame against a reference (a given structure or the first frame of the trajectory)
-        - run_measure:  run the all the measurements previously added
-        - run_boolean:  check if the measured parameters satisfy the given criteria
-        - config_saver: save the dictionary in JSON or YAML format containing all the measurements to carry out with the run_measure function
+        - add_distance:     measure the distance between two atoms or two groups of atoms (and return the shorter one)
+        - add_dihedral:     measure the dihedral angle between four atoms
+        - add_angle:        measure the angle between three atoms
+        - add_contacts:     measure the number of contacts at a given distance from a given selection of one or more atoms
+        - add_RMSD:         measure the RMSD for a selection of each frame against a reference (a given structure or the first frame of the trajectory)
+        - add_planar_angle: measure the angle between two planes defined by three atoms each one.
+        - run_measure:      run the all the measurements previously added
+        - run_boolean:      check if the measured parameters satisfy the given criteria
+        - config_saver:     save the dictionary in JSON or YAML format containing all the measurements to carry out with the run_measure function
 
     INPUT:
         - u: preloaded MDAnalysis' universe
@@ -696,7 +695,6 @@ class Measurements:
                             domain=measurement["options"]["domain"]
                         )
                     )
-
 
                 elif measurement["type"] == "contacts":
                     names = list(measurement["sel"][1].resnames)
