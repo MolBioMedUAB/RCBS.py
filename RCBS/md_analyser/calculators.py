@@ -1,14 +1,6 @@
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
-from ..exceptions import (
-    NotExistingInteraction,
-    NotSingleAtomSelectionError,
-    NotExistingInteraction,
-    OutputFormatNotAvailable,
-    NotAvailableOptionError,
-)
-from .selections import selection
 from numpy import min as npmin
 from numpy import max as npmax
 
