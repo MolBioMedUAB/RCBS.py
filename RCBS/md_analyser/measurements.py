@@ -492,7 +492,7 @@ class Measurements:
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
 
-        for ts in tqdm(self.universe.trajectory, desc='Analysing', units='frames'):
+        for ts in tqdm(self.universe.trajectory, desc='Analysing', unit='frames'):
 
             for measurement in self.measurements:
 
