@@ -3,7 +3,7 @@ from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
 
-from tqdm.autonotebook import trange, tqdm
+from tqdm.autonotebook import tqdm
 
 from numpy import min as npmin
 from numpy import max as npmax
@@ -492,7 +492,7 @@ class Measurements:
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
 
-        for ts in tqdm(self.universe.trajectory):
+        for ts in tqdm(self.universe.trajectory, desc='Analysing', units='frames'):
 
             for measurement in self.measurements:
 
