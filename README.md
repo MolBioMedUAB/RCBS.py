@@ -37,6 +37,6 @@ cd RCBS.py
 3. Install the package using pip or pip3
 
 ```bash
-pip install .
+pip install RCBS.py
 ```
 
