@@ -3,7 +3,7 @@ from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
 
-from progress.bar import ChargingBar
+from tqdm.autonotebook import trange, tqdm
 
 from numpy import min as npmin
 from numpy import max as npmax
@@ -492,61 +492,75 @@ class Measurements:
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
 
-        with ChargingBar('Analysing...', suffix='%(percent).1f%% - %(eta)ds') as bar:
-            for ts in self.universe.trajectory:
+        for ts in tqdm(self.universe.trajectory):
 
-                for measurement in self.measurements:
+            for measurement in self.measurements:
 
-                    if measurement["type"] == "distance":
-                        if measurement["options"]["type"] == "min":
+                if measurement["type"] == "distance":
+                    if measurement["options"]["type"] == "min":
+                        self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(measurement["sel"][1].positions),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                    elif measurement["options"]["type"] == "max":
+                        self.results[measurement["name"]].append(
+                            npmax(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(measurement["sel"][1].positions),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                    elif measurement["options"]["type"] == "com":
+                        self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].center_of_mass()),
+                                    array(measurement["sel"][1].center_of_mass()),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                    elif measurement["options"]["type"] == "cog":
+                        self.results[measurement["name"]].append(
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].center_of_geometry()),
+                                    array(measurement["sel"][1].center_of_geometry()),
+                                    backend="OpenMP",
+                                )
+                            )
+                        )
+
+                elif measurement["type"] == "dihedral":
+
+                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
                             self.results[measurement["name"]].append(
-                                npmin(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][0].positions),
-                                        array(measurement["sel"][1].positions),
+                                float(
+                                    mdadist.calc_dihedrals(
+                                        measurement["sel"][0].positions,
+                                        measurement["sel"][1].positions,
+                                        measurement["sel"][2].positions,
+                                        measurement["sel"][3].positions,
                                         backend="OpenMP",
                                     )
                                 )
                             )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
+                            from math import pi
 
-                        elif measurement["options"]["type"] == "max":
                             self.results[measurement["name"]].append(
-                                npmax(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][0].positions),
-                                        array(measurement["sel"][1].positions),
-                                        backend="OpenMP",
-                                    )
-                                )
-                            )
-
-                        elif measurement["options"]["type"] == "com":
-                            self.results[measurement["name"]].append(
-                                npmin(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][0].center_of_mass()),
-                                        array(measurement["sel"][1].center_of_mass()),
-                                        backend="OpenMP",
-                                    )
-                                )
-                            )
-
-                        elif measurement["options"]["type"] == "cog":
-                            self.results[measurement["name"]].append(
-                                npmin(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][0].center_of_geometry()),
-                                        array(measurement["sel"][1].center_of_geometry()),
-                                        backend="OpenMP",
-                                    )
-                                )
-                            )
-
-                    elif measurement["type"] == "dihedral":
-
-                        if measurement["options"]["units"] in ("rad", "radian", "radians"):
-                            if measurement["options"]["domain"] in (180, "180", "pi"):
-                                self.results[measurement["name"]].append(
+                                (
                                     float(
                                         mdadist.calc_dihedrals(
                                             measurement["sel"][0].positions,
@@ -556,35 +570,37 @@ class Measurements:
                                             backend="OpenMP",
                                         )
                                     )
+                                    + pi
                                 )
-                            elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                                from math import pi
+                                % pi
+                            )
 
-                                self.results[measurement["name"]].append(
-                                    (
-                                        float(
-                                            mdadist.calc_dihedrals(
-                                                measurement["sel"][0].positions,
-                                                measurement["sel"][1].positions,
-                                                measurement["sel"][2].positions,
-                                                measurement["sel"][3].positions,
-                                                backend="OpenMP",
-                                            )
+                    elif measurement["options"]["units"] in (
+                        "deg",
+                        "degree",
+                        "degrees",
+                    ):
+                        from numpy import rad2deg
+
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    rad2deg(
+                                        mdadist.calc_dihedrals(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            measurement["sel"][3].positions,
+                                            backend="OpenMP",
                                         )
-                                        + pi
                                     )
-                                    % pi
                                 )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
+                            from math import pi
 
-                        elif measurement["options"]["units"] in (
-                            "deg",
-                            "degree",
-                            "degrees",
-                        ):
-                            from numpy import rad2deg
-
-                            if measurement["options"]["domain"] in (180, "180", "pi"):
-                                self.results[measurement["name"]].append(
+                            self.results[measurement["name"]].append(
+                                (
                                     float(
                                         rad2deg(
                                             mdadist.calc_dihedrals(
@@ -596,33 +612,30 @@ class Measurements:
                                             )
                                         )
                                     )
+                                    + 360
                                 )
-                            elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                                from math import pi
+                                % 360
+                            )
 
-                                self.results[measurement["name"]].append(
-                                    (
-                                        float(
-                                            rad2deg(
-                                                mdadist.calc_dihedrals(
-                                                    measurement["sel"][0].positions,
-                                                    measurement["sel"][1].positions,
-                                                    measurement["sel"][2].positions,
-                                                    measurement["sel"][3].positions,
-                                                    backend="OpenMP",
-                                                )
-                                            )
-                                        )
-                                        + 360
+                elif measurement["type"] == "angle":
+
+                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    mdadist.calc_angles(
+                                        measurement["sel"][0].positions,
+                                        measurement["sel"][1].positions,
+                                        measurement["sel"][2].positions,
+                                        backend="OpenMP",
                                     )
-                                    % 360
                                 )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
+                            from math import pi
 
-                    elif measurement["type"] == "angle":
-
-                        if measurement["options"]["units"] in ("rad", "radian", "radians"):
-                            if measurement["options"]["domain"] in (180, "180", "pi"):
-                                self.results[measurement["name"]].append(
+                            self.results[measurement["name"]].append(
+                                (
                                     float(
                                         mdadist.calc_angles(
                                             measurement["sel"][0].positions,
@@ -631,34 +644,36 @@ class Measurements:
                                             backend="OpenMP",
                                         )
                                     )
+                                    + pi
                                 )
-                            elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                                from math import pi
+                                % pi
+                            )
 
-                                self.results[measurement["name"]].append(
-                                    (
-                                        float(
-                                            mdadist.calc_angles(
-                                                measurement["sel"][0].positions,
-                                                measurement["sel"][1].positions,
-                                                measurement["sel"][2].positions,
-                                                backend="OpenMP",
-                                            )
+                    elif measurement["options"]["units"] in (
+                        "deg",
+                        "degree",
+                        "degrees",
+                    ):
+                        from numpy import rad2deg
+
+                        if measurement["options"]["domain"] in (180, "180", "pi"):
+                            self.results[measurement["name"]].append(
+                                float(
+                                    rad2deg(
+                                        mdadist.calc_angles(
+                                            measurement["sel"][0].positions,
+                                            measurement["sel"][1].positions,
+                                            measurement["sel"][2].positions,
+                                            backend="OpenMP",
                                         )
-                                        + pi
                                     )
-                                    % pi
                                 )
+                            )
+                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
+                            from math import pi
 
-                        elif measurement["options"]["units"] in (
-                            "deg",
-                            "degree",
-                            "degrees",
-                        ):
-                            from numpy import rad2deg
-
-                            if measurement["options"]["domain"] in (180, "180", "pi"):
-                                self.results[measurement["name"]].append(
+                            self.results[measurement["name"]].append(
+                                (
                                     float(
                                         rad2deg(
                                             mdadist.calc_angles(
@@ -669,140 +684,123 @@ class Measurements:
                                             )
                                         )
                                     )
+                                    + 360
                                 )
-                            elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                                from math import pi
-
-                                self.results[measurement["name"]].append(
-                                    (
-                                        float(
-                                            rad2deg(
-                                                mdadist.calc_angles(
-                                                    measurement["sel"][0].positions,
-                                                    measurement["sel"][1].positions,
-                                                    measurement["sel"][2].positions,
-                                                    backend="OpenMP",
-                                                )
-                                            )
-                                        )
-                                        + 360
-                                    )
-                                    % 360
-                                )
-
-                    elif measurement["type"] == "planar_angle":
-
-                        self.results[measurement["name"]].append(
-                            planar_angle(
-                                plane_A=measurement["sel"][0].positions,
-                                plane_B=measurement["sel"][1].positions,
-                                units=measurement["options"]["units"],
-                                domain=measurement["options"]["domain"]
+                                % 360
                             )
+
+                elif measurement["type"] == "planar_angle":
+
+                    self.results[measurement["name"]].append(
+                        planar_angle(
+                            plane_A=measurement["sel"][0].positions,
+                            plane_B=measurement["sel"][1].positions,
+                            units=measurement["options"]["units"],
+                            domain=measurement["options"]["domain"]
+                        )
+                    )
+
+                elif measurement["type"] == "contacts":
+                    names = list(measurement["sel"][1].resnames)
+                    ids = list(measurement["sel"][1].resids)
+
+                    dict_ = {}
+
+                    for i in range(len(ids)):
+                        if ids[i] not in measurement["sel"][0].residues.resindices:
+                            if str(names[i]) in measurement["options"]["interactions"]:
+                                dict_[int(ids[i])] = names[i]
+
+                    #                    for i, n in zip(ids, names):
+                    #                        if i not in measurement["sel"][1].residues.resindices:
+                    #                            if str(n)[:3] in measurement["options"]["interactions"]:
+                    #                                dict_[int(str(i))] = n
+
+                    self.results[measurement["name"]].append(dict_)
+
+                elif measurement["type"] == "distWATbridge":
+                    if (
+                        "WAT" not in measurement["sel"][2].resnames
+                        or "WAT" not in measurement["sel"][3].resnames
+                    ):  # No WAT in one or both selections' environment
+                        self.results[measurement["name"]].append([None, None, None])
+
+                    elif (
+                        len(
+                            set(measurement["sel"][2].resids)
+                            & set(measurement["sel"][3].resids)
+                        )
+                        == 0
+                    ):  # No WAT present in both environments
+                        self.results[measurement["name"]].append([None, None, None])
+
+                    else:  # WAT residues in both environments and at least one of them coincident
+                        WATs = list(
+                            set(measurement["sel"][2].resids)
+                            & set(measurement["sel"][3].resids)
                         )
 
-                    elif measurement["type"] == "contacts":
-                        names = list(measurement["sel"][1].resnames)
-                        ids = list(measurement["sel"][1].resids)
-
-                        dict_ = {}
-
-                        for i in range(len(ids)):
-                            if ids[i] not in measurement["sel"][0].residues.resindices:
-                                if str(names[i]) in measurement["options"]["interactions"]:
-                                    dict_[int(ids[i])] = names[i]
-
-                        #                    for i, n in zip(ids, names):
-                        #                        if i not in measurement["sel"][1].residues.resindices:
-                        #                            if str(n)[:3] in measurement["options"]["interactions"]:
-                        #                                dict_[int(str(i))] = n
-
-                        self.results[measurement["name"]].append(dict_)
-
-                    elif measurement["type"] == "distWATbridge":
-                        if (
-                            "WAT" not in measurement["sel"][2].resnames
-                            or "WAT" not in measurement["sel"][3].resnames
-                        ):  # No WAT in one or both selections' environment
-                            self.results[measurement["name"]].append([None, None, None])
-
-                        elif (
-                            len(
-                                set(measurement["sel"][2].resids)
-                                & set(measurement["sel"][3].resids)
-                            )
-                            == 0
-                        ):  # No WAT present in both environments
-                            self.results[measurement["name"]].append([None, None, None])
-
-                        else:  # WAT residues in both environments and at least one of them coincident
-                            WATs = list(
-                                set(measurement["sel"][2].resids)
-                                & set(measurement["sel"][3].resids)
+                        for wat in WATs:
+                            selWAT = selection(
+                                self.universe, int(wat), sel_type="res_num"
                             )
 
-                            for wat in WATs:
-                                selWAT = selection(
-                                    self.universe, int(wat), sel_type="res_num"
+                            dist1_ = npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
                                 )
+                            )
 
-                                dist1_ = npmin(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][0].positions),
-                                        array(selWAT.positions),
-                                        backend="OpenMP",
-                                    )
+                            dist2_ = npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][1].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
                                 )
+                            )
 
-                                dist2_ = npmin(
-                                    mdadist.distance_array(
-                                        array(measurement["sel"][1].positions),
-                                        array(selWAT.positions),
-                                        backend="OpenMP",
-                                    )
-                                )
-
-                                try:
-                                    if (dist1_ + dist2_) / 2 < (
-                                        dist1 + dist2
-                                    ) / 2:  # Closest WAT is the one with the shortest average distance to both of the sels
-                                        dist1, dist2 = dist1_, dist2_
-                                        closestWAT = wat
-
-                                    else:
-                                        pass
-
-                                except NameError:
+                            try:
+                                if (dist1_ + dist2_) / 2 < (
+                                    dist1 + dist2
+                                ) / 2:  # Closest WAT is the one with the shortest average distance to both of the sels
                                     dist1, dist2 = dist1_, dist2_
                                     closestWAT = wat
 
-                        self.results[measurement["name"]].append([closestWAT, dist1, dist2])
+                                else:
+                                    pass
 
-                        del selWAT
+                            except NameError:
+                                dist1, dist2 = dist1_, dist2_
+                                closestWAT = wat
 
-                    elif measurement["type"] == "rmsd":
-                        if measurement["options"]["superposition"] == True:
+                    self.results[measurement["name"]].append([closestWAT, dist1, dist2])
 
-                            self.results[measurement["name"]].append(
-                                rms.rmsd(
-                                    measurement["sel"].positions
-                                    - measurement["sel"].center_of_mass(),
-                                    measurement["ref"],
-                                    center=True,
-                                    superposition=True,
-                                )
+                    del selWAT
+
+                elif measurement["type"] == "rmsd":
+                    if measurement["options"]["superposition"] == True:
+
+                        self.results[measurement["name"]].append(
+                            rms.rmsd(
+                                measurement["sel"].positions
+                                - measurement["sel"].center_of_mass(),
+                                measurement["ref"],
+                                center=True,
+                                superposition=True,
                             )
+                        )
 
-                        elif measurement["options"]["superposition"] == False:
+                    elif measurement["options"]["superposition"] == False:
 
-                            self.results[measurement["name"]].append(
-                                rms.rmsd(
-                                    measurement["sel"].positions
-                                    - measurement["sel"].center_of_mass(),
-                                    measurement["ref"],
-                                )
+                        self.results[measurement["name"]].append(
+                            rms.rmsd(
+                                measurement["sel"].positions
+                                - measurement["sel"].center_of_mass(),
+                                measurement["ref"],
                             )
-            bar.next()
+                        )
 
         if save_output != False:
 

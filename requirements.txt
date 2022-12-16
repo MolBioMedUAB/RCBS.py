@@ -1,4 +1,4 @@
 MDAnalysis
 pyyaml
 numpy
-progress
+tqdm
