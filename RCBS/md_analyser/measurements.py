@@ -20,6 +20,7 @@ from ..exceptions import (
 from .selections import selection
 from .calculators import planar_angle
 
+
 class Measurements:
     """
     DESCRIPTION:
@@ -492,7 +493,7 @@ class Measurements:
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
 
-        for ts in tqdm(self.universe.trajectory, desc='Analysing', unit='frames'):
+        for ts in tqdm(self.universe.trajectory, desc="Analysing", unit="frames"):
 
             for measurement in self.measurements:
 
@@ -696,7 +697,7 @@ class Measurements:
                             plane_A=measurement["sel"][0].positions,
                             plane_B=measurement["sel"][1].positions,
                             units=measurement["options"]["units"],
-                            domain=measurement["options"]["domain"]
+                            domain=measurement["options"]["domain"],
                         )
                     )
 
