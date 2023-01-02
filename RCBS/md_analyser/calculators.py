@@ -4,10 +4,20 @@ import MDAnalysis.analysis.rms as rms
 from numpy import min as npmin
 from numpy import max as npmax
 
+"""
+DESCRIPTION
+    This Python file contains the calculators that are called from measurements.py.
+    Each function needs to input the selections and the options.
+"""
 
 def build_plane(
     positions,  # nx3, being n the number of atoms that build the plane
 ):
+    """
+    DESCRIPTION
+        Function for obtaining the equation of the plane from a given list containing the positions of three atoms.
+        It is used in the 'planar_ange' function.
+    """
     from numpy import array, cross, dot
 
     if len(positions) == 3:
@@ -60,3 +70,36 @@ def planar_angle(
             ang = (rad2deg(ang) + 360) % 360
 
     return ang
+
+
+def distance(
+    sel1, # selection containing one or more atoms
+    sel2, # selection containing one or more atoms
+    type # [min | max | com | cog ]
+):
+    """
+    DESCRIPTION
+        Function that takes two selections and gives:
+            - minimum distance
+            - maximum distance
+            - distance between Centers of Mass
+            - distance between Centers of Geometry
+    """
+
+    if type == 'min':
+        d = npmin(mdadist.distance_array(sel1, sel2, backend='OpenMP')
+
+    elif type == 'max':
+        d = npmax(mdadist.distance_array(sel1, sel2, backend='OpenMP')
+
+    elif type == 'com':
+        d = mdadist.distance_array(sel1.center_of_mass(), sel2.center_of_mass(), backend='OpenMP')
+
+    elif type == 'cog':
+        d = mdadist.distance_array(sel1.center_of_geometry(), sel2.center_of_geometry(), backend='OpenMP')
+
+    return d
+
+
+
+

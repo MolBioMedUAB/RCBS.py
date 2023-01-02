@@ -18,7 +18,7 @@ from ..exceptions import (
     NotThreeAtomsSelectionError,
 )
 from .selections import selection
-from .calculators import planar_angle
+import .calculators
 
 
 class Measurements:
@@ -498,49 +498,12 @@ class Measurements:
             for measurement in self.measurements:
 
                 if measurement["type"] == "distance":
-                    if measurement["options"]["type"] == "min":
-                        self.results[measurement["name"]].append(
-                            npmin(
-                                mdadist.distance_array(
-                                    array(measurement["sel"][0].positions),
-                                    array(measurement["sel"][1].positions),
-                                    backend="OpenMP",
-                                )
-                            )
-                        )
 
-                    elif measurement["options"]["type"] == "max":
-                        self.results[measurement["name"]].append(
-                            npmax(
-                                mdadist.distance_array(
-                                    array(measurement["sel"][0].positions),
-                                    array(measurement["sel"][1].positions),
-                                    backend="OpenMP",
-                                )
-                            )
-                        )
-
-                    elif measurement["options"]["type"] == "com":
-                        self.results[measurement["name"]].append(
-                            npmin(
-                                mdadist.distance_array(
-                                    array(measurement["sel"][0].center_of_mass()),
-                                    array(measurement["sel"][1].center_of_mass()),
-                                    backend="OpenMP",
-                                )
-                            )
-                        )
-
-                    elif measurement["options"]["type"] == "cog":
-                        self.results[measurement["name"]].append(
-                            npmin(
-                                mdadist.distance_array(
-                                    array(measurement["sel"][0].center_of_geometry()),
-                                    array(measurement["sel"][1].center_of_geometry()),
-                                    backend="OpenMP",
-                                )
-                            )
-                        )
+                    calculators.distance(
+                        measurement["sel"][0],
+                        measurement["sel"][1]
+                        measurement["options"]["type"]
+                    )
 
                 elif measurement["type"] == "dihedral":
 
@@ -693,7 +656,7 @@ class Measurements:
                 elif measurement["type"] == "planar_angle":
 
                     self.results[measurement["name"]].append(
-                        planar_angle(
+                        calculators.planar_angle(
                             plane_A=measurement["sel"][0].positions,
                             plane_B=measurement["sel"][1].positions,
                             units=measurement["options"]["units"],
