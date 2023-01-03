@@ -18,7 +18,7 @@ from ..exceptions import (
     NotThreeAtomsSelectionError,
 )
 from .selections import selection
-import .calculators
+import calculators
 
 
 class Measurements:
@@ -499,159 +499,39 @@ class Measurements:
 
                 if measurement["type"] == "distance":
 
-                    calculators.distance(
-                        measurement["sel"][0],
-                        measurement["sel"][1]
-                        measurement["options"]["type"]
+                    self.results[measurement["name"]].append(
+                        calculators.distance(
+                            measurement["sel"][0],
+                            measurement["sel"][1],
+                            measurement["options"]["type"]
+                        )
                     )
 
                 elif measurement["type"] == "dihedral":
 
-                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
-                        if measurement["options"]["domain"] in (180, "180", "pi"):
-                            self.results[measurement["name"]].append(
-                                float(
-                                    mdadist.calc_dihedrals(
-                                        measurement["sel"][0].positions,
-                                        measurement["sel"][1].positions,
-                                        measurement["sel"][2].positions,
-                                        measurement["sel"][3].positions,
-                                        backend="OpenMP",
-                                    )
-                                )
-                            )
-                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                            from math import pi
-
-                            self.results[measurement["name"]].append(
-                                (
-                                    float(
-                                        mdadist.calc_dihedrals(
-                                            measurement["sel"][0].positions,
-                                            measurement["sel"][1].positions,
-                                            measurement["sel"][2].positions,
-                                            measurement["sel"][3].positions,
-                                            backend="OpenMP",
-                                        )
-                                    )
-                                    + pi
-                                )
-                                % pi
-                            )
-
-                    elif measurement["options"]["units"] in (
-                        "deg",
-                        "degree",
-                        "degrees",
-                    ):
-                        from numpy import rad2deg
-
-                        if measurement["options"]["domain"] in (180, "180", "pi"):
-                            self.results[measurement["name"]].append(
-                                float(
-                                    rad2deg(
-                                        mdadist.calc_dihedrals(
-                                            measurement["sel"][0].positions,
-                                            measurement["sel"][1].positions,
-                                            measurement["sel"][2].positions,
-                                            measurement["sel"][3].positions,
-                                            backend="OpenMP",
-                                        )
-                                    )
-                                )
-                            )
-                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                            from math import pi
-
-                            self.results[measurement["name"]].append(
-                                (
-                                    float(
-                                        rad2deg(
-                                            mdadist.calc_dihedrals(
-                                                measurement["sel"][0].positions,
-                                                measurement["sel"][1].positions,
-                                                measurement["sel"][2].positions,
-                                                measurement["sel"][3].positions,
-                                                backend="OpenMP",
-                                            )
-                                        )
-                                    )
-                                    + 360
-                                )
-                                % 360
-                            )
+                    self.results[measurement["name"]].append(
+                        calculators.dihedral(
+                            measurement["sel"][0],
+                            measurement["sel"][1],
+                            measurement["sel"][2],
+                            measurement["sel"][3],
+                            measurement["options"]["units"],
+                            measurement["options"]["domain"]
+                        )
+                    )
 
                 elif measurement["type"] == "angle":
 
-                    if measurement["options"]["units"] in ("rad", "radian", "radians"):
-                        if measurement["options"]["domain"] in (180, "180", "pi"):
-                            self.results[measurement["name"]].append(
-                                float(
-                                    mdadist.calc_angles(
-                                        measurement["sel"][0].positions,
-                                        measurement["sel"][1].positions,
-                                        measurement["sel"][2].positions,
-                                        backend="OpenMP",
-                                    )
-                                )
-                            )
-                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                            from math import pi
+                    self.results[measurement["name"]].append(
+                        calculators.angle(
+                            measurement["sel"][0],
+                            measurement["sel"][1],
+                            measurement["sel"][2],
+                            measurement["options"]["units"],
+                            measurement["options"]["domain"]
+                        )
+                    )
 
-                            self.results[measurement["name"]].append(
-                                (
-                                    float(
-                                        mdadist.calc_angles(
-                                            measurement["sel"][0].positions,
-                                            measurement["sel"][1].positions,
-                                            measurement["sel"][2].positions,
-                                            backend="OpenMP",
-                                        )
-                                    )
-                                    + pi
-                                )
-                                % pi
-                            )
-
-                    elif measurement["options"]["units"] in (
-                        "deg",
-                        "degree",
-                        "degrees",
-                    ):
-                        from numpy import rad2deg
-
-                        if measurement["options"]["domain"] in (180, "180", "pi"):
-                            self.results[measurement["name"]].append(
-                                float(
-                                    rad2deg(
-                                        mdadist.calc_angles(
-                                            measurement["sel"][0].positions,
-                                            measurement["sel"][1].positions,
-                                            measurement["sel"][2].positions,
-                                            backend="OpenMP",
-                                        )
-                                    )
-                                )
-                            )
-                        elif measurement["options"]["domain"] in (360, "360", "2pi"):
-                            from math import pi
-
-                            self.results[measurement["name"]].append(
-                                (
-                                    float(
-                                        rad2deg(
-                                            mdadist.calc_angles(
-                                                measurement["sel"][0].positions,
-                                                measurement["sel"][1].positions,
-                                                measurement["sel"][2].positions,
-                                                backend="OpenMP",
-                                            )
-                                        )
-                                    )
-                                    + 360
-                                )
-                                % 360
-                            )
 
                 elif measurement["type"] == "planar_angle":
 
