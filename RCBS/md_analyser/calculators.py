@@ -1,8 +1,6 @@
 from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
-from numpy import min as npmin
-from numpy import max as npmax
 
 """
 DESCRIPTION
@@ -18,7 +16,7 @@ def build_plane(
         Function for obtaining the equation of the plane from a given list containing the positions of three atoms.
         It is used in the 'planar_ange' function.
     """
-    from numpy import array, cross, dot
+    from numpy import cross, dot
 
     if len(positions) == 3:
         v1 = positions[2] - positions[0]
@@ -37,7 +35,7 @@ def planar_angle(
     units,  # [ deg | rad ]
     domain,  # [ 360 | 180 ] 360: (0, 360); 180: (-180, 180)
 ):
-    from numpy import arccos, absolute, sqrt
+    from numpy import arccos, sqrt
 
     plane_A = build_plane(plane_A)
     plane_B = build_plane(plane_B)
@@ -82,15 +80,17 @@ def distance(
         Function that takes two selections and gives:
             - minimum distance
             - maximum distance
-            - distance between Centers of Mass
-            - distance between Centers of Geometry
+            - distance between Centers of Mass (com)
+            - distance between Centers of Geometry (cog)
     """
+    from numpy import min as npmin
+    from numpy import max as npmax
 
     if type == 'min':
-        d = npmin(mdadist.distance_array(sel1, sel2, backend='OpenMP')
+        d = npmin(mdadist.distance_array(sel1, sel2, backend='OpenMP'))
 
     elif type == 'max':
-        d = npmax(mdadist.distance_array(sel1, sel2, backend='OpenMP')
+        d = npmax(mdadist.distance_array(sel1, sel2, backend='OpenMP'))
 
     elif type == 'com':
         d = mdadist.distance_array(sel1.center_of_mass(), sel2.center_of_mass(), backend='OpenMP')
@@ -101,5 +101,81 @@ def distance(
     return d
 
 
+def dihedral(
+    sel1,
+    sel2,
+    sel3,
+    sel4,
+    units, # [ rad | deg ]
+    domain # [ 180 | 360 ]
+):
+    """
+    DESCRIPTION
+        Function that calculates the dihedral angle between four atoms.
+        Dihedral angle is calculated by calculating the planar angle of the planes builds by the sel1, sel2, sel3 and sel2, sel3, sel4.
+
+    OPTIONS (as arguments)
+        - units: radians (rad) or degrees (deg)
+        - domain: -180 to 180 º or 0 to 360º
+    """
+
+    d = mdadist.calc_dihedrals(sel1, sel2, sel3, sel4, backend="OpenMP")
+
+    if units in ("rad", "radian", "radians", "pi"):
+        from math import pi
+
+        if domain in (360, "360", "2pi"):
+            d = ( d + pi ) % pi
+            return d
+        elif domain in (180, "180", "pi"):
+            return d
+
+    elif units in ("deg", "degree", "degrees"):
+        from numpy import rad2deg
+
+        d = rad2deg(d)
+        if domain in (360, "360", "2pi"):
+            d = ( d + 360 ) % 360
+            return d
+        elif domain in (180, "180", "pi"):
+            return d
 
 
+
+def angle(
+    sel1,
+    sel2,
+    sel3,
+    units, # [ rad | deg ]
+    domain # [ 180 | 360 ]
+):
+    """
+    DESCRIPTION
+        Function that calculates the angle between three atoms.
+        Order of selection is important (sel2 is the vertex)
+
+    OPTIONS (as arguments)
+        - units: radians (rad) or degrees (deg)
+        - domain: -180 to 180 º or 0 to 360º
+    """
+
+    a = mdadist.calc_angles(sel1, sel2, sel3, backend="OpenMP")
+
+    if units in ("rad", "radian", "radians", "pi"):
+        from math import pi
+
+        if domain in (360, "360", "2pi"):
+            a = ( a + pi ) % pi
+            return a
+        elif domain in (180, "180", "pi"):
+            return a
+
+    elif units in ("deg", "degree", "degrees"):
+        from numpy import rad2deg
+
+        a = rad2deg(a)
+        if domain in (360, "360", "2pi"):
+            a = ( a + 360 ) % 360
+            return a
+        elif domain in (180, "180", "pi"):
+            return a
