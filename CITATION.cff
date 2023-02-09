@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Canyelles-Niño"
+  given-names: "Miquel"
+  orcid: "https://orcid.org/0000-0002-8221-2781"
+title: "RCBS.py: Reactivity of Chemical and Biochemical Systems"
+version: 2.0.4
+doi: 10.5281/zenodo.7626048
+date-released: 2022-12-20
+url: "https://github.com/dynamicsUAB/RCBS.py"
