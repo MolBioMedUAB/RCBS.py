@@ -18,7 +18,7 @@ from ..exceptions import (
     NotThreeAtomsSelectionError,
 )
 from .selections import selection
-import calculators
+from .calculators import *
 
 
 class Measurements:
@@ -500,7 +500,7 @@ class Measurements:
                 if measurement["type"] == "distance":
 
                     self.results[measurement["name"]].append(
-                        calculators.distance(
+                        distance(
                             measurement["sel"][0],
                             measurement["sel"][1],
                             measurement["options"]["type"]
@@ -510,7 +510,7 @@ class Measurements:
                 elif measurement["type"] == "dihedral":
 
                     self.results[measurement["name"]].append(
-                        calculators.dihedral(
+                        dihedral(
                             measurement["sel"][0],
                             measurement["sel"][1],
                             measurement["sel"][2],
@@ -523,7 +523,7 @@ class Measurements:
                 elif measurement["type"] == "angle":
 
                     self.results[measurement["name"]].append(
-                        calculators.angle(
+                        angle(
                             measurement["sel"][0],
                             measurement["sel"][1],
                             measurement["sel"][2],
@@ -536,7 +536,7 @@ class Measurements:
                 elif measurement["type"] == "planar_angle":
 
                     self.results[measurement["name"]].append(
-                        calculators.planar_angle(
+                        planar_angle(
                             plane_A=measurement["sel"][0].positions,
                             plane_B=measurement["sel"][1].positions,
                             units=measurement["options"]["units"],
