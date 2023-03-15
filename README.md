@@ -1,5 +1,6 @@
 # RCBS.py
 
+[![DOI](https://zenodo.org/badge/266803510.svg)](https://zenodo.org/badge/latestdoi/266803510)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/dynamicsUAB/RCBS.py)](https://github.com/dynamicsUAB/RCBS.py)
 [![PyPI](https://img.shields.io/pypi/v/RCBS.py)](https://pypi.org/project/RCBS.py/)
 ![GitHub](https://img.shields.io/github/license/dynamicsUAB/RCBS.py)
