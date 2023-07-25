@@ -141,7 +141,6 @@ def dihedral(
             return d
 
 
-
 def angle(
     sel1,
     sel2,
