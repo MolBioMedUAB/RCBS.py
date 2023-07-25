@@ -393,6 +393,8 @@ class Measurements:
             - List of dictionaries containing the number of the bridging water and the smallest distance to each of the selection sets.
         """
 
+        sel1_rad, sel2_rad = sel1_env, sel2_env
+
         sel1_env = self.universe.select_atoms(
             "resname WAT and around %s group select" % sel1_env,
             select=sel1,
@@ -409,7 +411,7 @@ class Measurements:
             {
                 "name": name,
                 "type": "distWATbridge",
-                "sel": [sel1, sel2, sel1_env, sel2_env],
+                "sel": [sel1, sel2, sel1_env, sel2_env, sel1_rad, sel2_rad],
                 "options": None,
             }
         )
@@ -566,16 +568,13 @@ class Measurements:
                     if (
                         "WAT" not in measurement["sel"][2].resnames
                         or "WAT" not in measurement["sel"][3].resnames
-                    ):  # No WAT in one or both selections' environment
-                        self.results[measurement["name"]].append([None, None, None])
-
-                    elif (
+                    ) or (
                         len(
                             set(measurement["sel"][2].resids)
                             & set(measurement["sel"][3].resids)
                         )
                         == 0
-                    ):  # No WAT present in both environments
+                    ):  # No WAT in one or both selections' environment
                         self.results[measurement["name"]].append([None, None, None])
 
                     else:  # WAT residues in both environments and at least one of them coincident
@@ -605,23 +604,44 @@ class Measurements:
                                 )
                             )
 
-                            try:
-                                if (dist1_ + dist2_) / 2 < (
-                                    dist1 + dist2
-                                ) / 2:  # Closest WAT is the one with the shortest average distance to both of the sels
+                            if dist1_ <= measurement["sel"][4] and dist2_ <= measurement["sel"][5]:
+
+                                try:
+                                    if (dist1_ + dist2_) / 2 < (
+                                        dist1 + dist2
+                                    ) / 2:  # Closest WAT is the one with the shortest average distance to both of the sels
+                                        dist1, dist2 = dist1_, dist2_
+                                        closestWAT = wat
+
+                                    else:
+                                        pass
+
+                                except NameError:
                                     dist1, dist2 = dist1_, dist2_
                                     closestWAT = wat
 
-                                else:
-                                    pass
+                        selWAT = selection(
+                                self.universe, int(closestWAT), sel_type="res_num"
+                            )
 
-                            except NameError:
-                                dist1, dist2 = dist1_, dist2_
-                                closestWAT = wat
+                        self.results[measurement["name"]].append(
+                            [closestWAT,
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][0].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
+                                )
+                            ),
+                            npmin(
+                                mdadist.distance_array(
+                                    array(measurement["sel"][1].positions),
+                                    array(selWAT.positions),
+                                    backend="OpenMP",
+                                )
+                            )])
 
-                    self.results[measurement["name"]].append([closestWAT, dist1, dist2])
-
-                    del selWAT
+                        del selWAT, closestWAT, dist1_, dist1, dist2_, dist2
 
                 elif measurement["type"] == "rmsd":
                     if measurement["options"]["superposition"] == True:
