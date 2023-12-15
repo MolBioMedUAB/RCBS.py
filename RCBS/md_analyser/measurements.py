@@ -477,14 +477,17 @@ class Measurements:
 
         return config
 
-    def run_measure(self, step=1, first=0, last=-1, save_output=False, verbose=True):
+    def run_measure(self, step=1, first=1, last=-1, save_output=False, verbose=True):
         """
         DESCRIPTION:
             Function for runninng all the configured measurments on a given trajectory (loaded as self.universe). It can take also a configuration stored in a file instead of taking the in-situ configurated measurement.
 
         OPTIONS:
-            - save_output: Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
-
+            - save_output:  Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
+            - step:         Frames to jump during the analysis. Default is 1, so all the trajectory will be analysed.
+            - first:        First frame to start the analysis. Default is 0.
+            - last:         
+            
         INPUT:
             - self: containing self.universe and self.measurements (if not loading a configuration file)
 
@@ -494,6 +497,8 @@ class Measurements:
 
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
+
+        if last == -1: last = 0 #So in next line, last-1 = -1 and the last frame is selected.
 
         for ts in tqdm(self.universe.trajectory[first-1:last-1:step], desc="Analysing", unit="frames"):
 
