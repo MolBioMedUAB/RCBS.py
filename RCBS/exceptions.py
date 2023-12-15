@@ -84,3 +84,13 @@ class NotAvailableOptionError(Exception):
         )
 
     pass
+
+class EmptyMeasurementsError(Exception):
+    """
+    Raised when no measurment has been added when executing m.run_measure()
+    """
+    
+    def __init__(self):
+        Exception.__init__(self, "Add at least one measurement and run again.")
+
+    pass

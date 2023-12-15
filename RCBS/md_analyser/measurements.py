@@ -16,6 +16,7 @@ from ..exceptions import (
     OutputFormatNotAvailable,
     NotAvailableOptionError,
     NotThreeAtomsSelectionError,
+    EmptyMeasurementsError,
 )
 from .selections import selection
 from .calculators import *
@@ -495,8 +496,11 @@ class Measurements:
             - self.results: dictionary containing arrays of the results keyed by the given name of the configuration.
         """
 
-        for measurement in self.measurements:
-            self.results[measurement["name"]] = []
+        if len(self.measurements) == 0:
+            raise EmptyMeasurementsError
+        else :
+            for measurement in self.measurements:
+                self.results[measurement["name"]] = []
 
         if last == -1: last = len(self.universe.trajectory) # so if no last frame given, last in trajectory is chosen.
 
