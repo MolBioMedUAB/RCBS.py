@@ -486,7 +486,7 @@ class Measurements:
             - save_output:  Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
             - step:         Frames to jump during the analysis. Default is 1, so all the trajectory will be analysed.
             - first:        First frame to start the analysis. Default is 0.
-            - last:         
+            - last:         Last frame to analyse (included). Default is last frame of trajectory
             
         INPUT:
             - self: containing self.universe and self.measurements (if not loading a configuration file)
@@ -498,9 +498,9 @@ class Measurements:
         for measurement in self.measurements:
             self.results[measurement["name"]] = []
 
-        if last == -1: last = 0 #So in next line, last-1 = -1 and the last frame is selected.
+        if last == -1: last = len(self.universe.trajectory) # so if no last frame given, last in trajectory is chosen.
 
-        for ts in tqdm(self.universe.trajectory[first-1:last-1:step], desc="Analysing", unit="frames"):
+        for ts in tqdm(self.universe.trajectory[first-1:last:step], desc="Analysing", unit="frames"):
 
             for measurement in self.measurements:
 
@@ -538,7 +538,6 @@ class Measurements:
                             measurement["options"]["domain"]
                         )
                     )
-
 
                 elif measurement["type"] == "planar_angle":
 
