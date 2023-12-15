@@ -7,9 +7,7 @@
 
 ## Description
 
-RCBS.py (Reactivity of Chemical and Biochemical Systems) is a Python package that contains several scripts and functions which try to simplify the analysis of MD simulations and, from these, to prepare the system to carry out QM/MM simulations using ChemShell. MD simulations analysis has been built in top of the MDAnalysis python package.
-
-The package is divided into two main modules: *md_analyser* and *qmmm_setup*.
+RCBS.py (Reactivity of Chemical and Biochemical Systems) is a Python package that contains several scripts and functions which try to simplify the analysis of MD simulations using the MDAnalysis python package.
 
 ### md_analyser
 
