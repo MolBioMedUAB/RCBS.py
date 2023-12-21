@@ -103,7 +103,7 @@ def trajectory_frame_extractor(
 
     """
 
-    structure_saver = lambda sel, file_name, outformat: sel.write(file_name + outformat)
+    structure_saver = lambda sel, file_name, outformat='.pdb': sel.write(file_name + outformat)
 
     if folder != "":
         check_folder(folder)
