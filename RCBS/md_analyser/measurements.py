@@ -417,6 +417,14 @@ class Measurements:
             }
         )
 
+    def remove_measurement(self, name):
+        if isinstance(name, str): name = [name] 
+        
+        for measurement_index in range(len(self.measurements)):
+            for name_ in name:
+                if self.measurements[measurement_index]['name'] == name_:
+                    self.measurements.pop(measurement_index)
+
     def config_saver(self, config_filename, verbose=True):
         """
         DESCRIPTION:
