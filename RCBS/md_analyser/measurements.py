@@ -377,7 +377,7 @@ class Measurements:
             }
         )
 
-    def add_distWATbridge(self, name, sel1, sel2, sel1_env=3, sel2_env=3):
+    def add_distWATbridge(self, name, sel1, sel2, sel1_rad=3, sel2_rad=3):
         """
         DESCRIPTION
            This function takes a Universe, two selections and the size of their environments and returns the nearest bridging water between the two selections and the distance to both of them.
@@ -387,23 +387,23 @@ class Measurements:
             - u            -> MDAnalysis Universe
             - sel1         -> selection of first set of central atoms. It has to be an AtomGroup
             - sel2         -> selection of second set of central atoms. It has to be an AtomGroup
-            - sel1_env      -> radius around the first set of central atoms (in ang)
-            - sel2_env      -> radius around the first set of central atoms (in ang)
+            - sel1_rad      -> radius around the first set of central atoms (in ang)
+            - sel2_rad      -> radius around the first set of central atoms (in ang)
 
         OUTPUT:
             - List of dictionaries containing the number of the bridging water and the smallest distance to each of the selection sets.
         """
 
-        sel1_rad, sel2_rad = sel1_env, sel2_env
+        #sel1_rad, sel2_rad = sel1_env, sel2_env
 
         sel1_env = self.universe.select_atoms(
-            "resname WAT and around %s group select" % sel1_env,
+            "resname WAT and around %s group select" % sel1_rad,
             select=sel1,
             updating=True,
         )
 
         sel2_env = self.universe.select_atoms(
-            "resname WAT and around %s group select" % sel2_env,
+            "resname WAT and around %s group select" % sel2_rad,
             select=sel2,
             updating=True,
         )
@@ -419,7 +419,7 @@ class Measurements:
 
     def remove_measurement(self, name):
         if isinstance(name, str): name = [name] 
-        
+
         for measurement_index in range(len(self.measurements)):
             for name_ in name:
                 if self.measurements[measurement_index]['name'] == name_:
