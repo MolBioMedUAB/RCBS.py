@@ -2,6 +2,12 @@ from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
 
+from ..snippets import check_folder
+
+from subprocess import run as run_command
+from os import remove, chdir
+
+
 """
 DESCRIPTION
     This Python file contains the calculators that are called from measurements.py.
@@ -178,3 +184,67 @@ def angle(
             return a
         elif domain in (180, "180", "pi"):
             return a
+        
+
+def  pka(
+        sel_protein,            # whole protein AtomGroup for saving PDB
+        #sel_pka=None,           # optional selection for checking only the pKa of the selected resids
+        pka_ref='neutral',  
+        pdb_folder='.propka',  # folder to store files
+        frame='current',
+        keep_pdb=False,
+        keep_pka=False,
+):
+    
+
+    # save pdb
+    chdir(pdb_folder)
+    sel_protein.write(f"{frame}.pdb")
+
+    # predict pKa with PROpKa
+    run_command(
+        [
+            "propka3",
+            "-r", pka_ref,
+            f"{frame}.pdb",
+        ]
+    )
+
+    # read .pka file
+    f = open(f"{frame}.pka").readlines()
+
+    # parse .pka file
+    save_pka = False
+    for l in f:
+        if l.startswith('SUMMARY OF THIS PREDICTION'):
+            save_pka = True
+            pkas = {}
+            continue
+
+        if save_pka:
+            if l.startswith('--------------------------------------------------------------------------------------------------------'):
+                save_pka = False
+                continue
+            elif l.startswith('       Group'):
+                pass
+            else :
+                l = l.split()
+                if float(l[3]) != 99.99:
+                    pkas[l[0] + str(int(l[1]))] = float(l[3])
+
+    # remove PDBs if indicated
+    if not keep_pdb:
+        remove(f"{frame}.pdb")
+
+    # remove .pKas if indicated
+    if not keep_pka:
+        remove(f"{frame}.pka")
+    
+    chdir ('..')
+
+    return pkas
+
+
+
+
+

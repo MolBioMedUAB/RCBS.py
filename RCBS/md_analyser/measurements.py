@@ -417,6 +417,46 @@ class Measurements:
             }
         )
 
+    def add_pKa(self, name, excluded_ions=["Na+", "Cl-"], pka_ref='neutral', pdb_folder='.pka', keep_pdb=False, keep_pka=False):
+        """
+        DESCRIPTION:
+            This function allows the prediction of the pKa using PROpKa3 of the protein for each frame.
+
+        INPUT:
+            - name:             name of the measurement
+            - excluded_ions:    list of solvent ions names that belong to solvent. Default are Na+ and Cl-.
+            - pka_ref:          reference to calculate pKa. Default is neutral. [ neutral | low-pH]
+            - keep_pdb:         trigger for keeping generated pdbs. Default is False. [ True | False ]
+            - keep_pka:         trigger for keeping generated .pka file. Default is False. [ True | False ]
+
+        OUPUT:
+            - Per-frame array of dicts with shape { residue : pKa }
+        """
+
+        print('WARNING!!:')
+        print('  Take into account that pKa calculation with PROpKA requires')
+        print('  the generation of a PDB for each analysed frame.')
+        print('  This can be very time consuming for long trajectory, so consider')
+        print('  using the step option in run_measure() to reduce')
+        print('  the amount of analysed structures.')
+
+        excluded_ions = ' or resname '.join(excluded_ions)
+
+        self.measurements.append(
+            {
+                "name" : name,
+                "type" : "pka",
+                "sel"  : self.universe.select_atoms("not (resname WAT or resname HOH or resname " + excluded_ions + ')'),
+                "options" :
+                    { 
+                        "pka_ref" : pka_ref,
+                        "pdb_folder" : pdb_folder,
+                        "keep_pdb" : keep_pdb,
+                        "keep_pka" : keep_pka
+                    },
+            }
+        )
+ 
     def remove_measurement(self, name):
         if isinstance(name, str): name = [name] 
 
@@ -512,6 +552,7 @@ class Measurements:
 
         if last == -1: last = len(self.universe.trajectory) # so if no last frame given, last in trajectory is chosen.
 
+        first = True
         for ts in tqdm(self.universe.trajectory[first-1:last:step], desc="Analysing", unit="frames"):
 
             for measurement in self.measurements:
@@ -681,6 +722,24 @@ class Measurements:
                                 measurement["ref"],
                             )
                         )
+
+                elif measurement["type"] == 'pka':
+
+                    if first:
+                        check_folder(measurement["options"]["pdb_folder"])
+
+                    self.results[measurement["name"]].append(
+                        pka(
+                            sel_protein= measurement["sel"],
+                            pka_ref= measurement["options"]["pka_ref"],
+                            pdb_folder= measurement["options"]["pdb_folder"],
+                            frame= str(ts.frame),
+                            keep_pdb= measurement["options"]["keep_pdb"],
+                            keep_pka= measurement["options"]["keep_pka"]
+                        )
+                    )
+
+        first = False
 
         if save_output != False:
 
