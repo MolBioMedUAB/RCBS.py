@@ -8,3 +8,5 @@ RCBS/examples/md_analyser/.ipynb_checkpoints/md_analyzer_example-checkpoint.ipyn
 dist/
 __pycache__/
 RCBS.code-workspace
+notes/
+RCBS/examples/md_analyser/trajectory_analysis_and_frame_extraction_testing.ipynb
