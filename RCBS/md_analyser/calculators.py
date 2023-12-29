@@ -278,3 +278,38 @@ def contacts_selection(
 
     return contacts
 
+
+def contacts_protein(
+        sel, 
+        sel_env,
+        interactions,
+        measure_distances= False,
+        out_format= 'new'
+):
+    
+    contacts = {}
+
+    protein_residues = ["ARG", "HIS", "HID", "HIE", "HIP", "HSD", "HSE", "HSP", "LYS", "ASP", "ASH", "GLU", "GLH", "SER", "THR", 
+                        "ASN", "GLN", "CYS", "SEC", "GLY", "PRO", "ALA", "ILE", "LEU", "MET", "PHE", "TRP", "TYR", "VAL"]
+    
+
+    for residue in sel.atoms.select_atoms('protein').residues:
+        #if residue.resname not in protein_residues:
+            # if the residue does not belong to the protein, skip it
+        #    continue
+
+        residue_env = sel.atoms.select_atoms('around %s group select' % str(sel_env), select=residue.atoms)
+
+        contacts[residue.resname + str(residue.resid)] = contacts_selection(
+            sel=residue.atoms,
+            sel_env=residue_env,
+            interactions=interactions,
+            measure_distances=measure_distances,
+            out_format=out_format
+        )
+
+    return contacts
+
+
+
+

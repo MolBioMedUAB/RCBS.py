@@ -31,9 +31,10 @@ class Measurements:
         - add_distance:     measure the distance between two atoms or two groups of atoms (and return the shorter one)
         - add_dihedral:     measure the dihedral angle between four atoms
         - add_angle:        measure the angle between three atoms
-        - add_contacts:     measure the number of contacts at a given distance from a given selection of one or more atoms
+        - add_contacts:     measure the number of contacts at a given distance from a given selection of one or more atoms or the residue-wise contacts of all the protein
         - add_RMSD:         measure the RMSD for a selection of each frame against a reference (a given structure or the first frame of the trajectory)
         - add_planar_angle: measure the angle between two planes defined by three atoms each one.
+        - add_pKa:          measure the residue-wise pKa.
         - run_measure:      run the all the measurements previously added
         - run_boolean:      check if the measured parameters satisfy the given criteria
         - config_saver:     save the dictionary in JSON or YAML format containing all the measurements to carry out with the run_measure function
@@ -353,6 +354,7 @@ class Measurements:
                 if measure_distances:
                     print("Distances can not been calculated using the old output format. \
                           'measure_distances' has been set to False.")
+                    out_format = 'new'
                     
             elif str(out_format).lower() in ['0.3', 'new', 'n']:
                 out_format = 'new'
@@ -376,12 +378,25 @@ class Measurements:
             )
 
         if isinstance(sel, str) and sel.lower() == 'protein':
+            print('hey')
+            
             mode = 'protein'
-            sel = self.universe.select_atoms('protein')
+            #sel = self.universe.select_atoms('protein')
+            sel = self.universe.select_atoms('all')
 
-
-
-
+            self.measurements.append(
+            {
+                "name": name,
+                "type" : "contacts",
+                "mode": mode,
+                "sel": [sel, sel_env],
+                "options": {
+                    "interactions"  : interactions,
+                    "measure_dists" : measure_distances,
+                    "out_format"    : 'new'
+                },
+            }
+            )
 
     def add_RMSD(self, name, sel, ref=None, superposition=True):
         """
@@ -564,16 +579,17 @@ class Measurements:
 
         return config
 
-    def run_measure(self, step=1, first=1, last=-1, save_output=False, verbose=True):
+    def run_measure(self, step=1, first=1, last=-1, save_output=False, verbose=True, previous_measurements='overwrite'):
         """
         DESCRIPTION:
             Function for runninng all the configured measurments on a given trajectory (loaded as self.universe). It can take also a configuration stored in a file instead of taking the in-situ configurated measurement.
 
         OPTIONS:
-            - save_output:  Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
-            - step:         Frames to jump during the analysis. Default is 1, so all the trajectory will be analysed.
-            - first:        First frame to start the analysis. Default is 0.
-            - last:         Last frame to analyse (included). Default is last frame of trajectory
+            - save_output:              Pseudoboolean value for storing the resutls as a file. False means no storing, any other string with the json or yaml extension means save the results in a file called as given.
+            - step:                     Frames to jump during the analysis. Default is 1, so all the trajectory will be analysed.
+            - first:                    First frame to start the analysis. Default is 0.
+            - last:                     Last frame to analyse (included). Default is last frame of trajectory
+            - previous_measurements:    [ 'overwrite'/'o' | 'append'/'a' ] Way of dealing with previous measurements with equal names. Options are selfexplanatory and 'overwrite' is the default value.
             
         INPUT:
             - self: containing self.universe and self.measurements (if not loading a configuration file)
@@ -597,6 +613,9 @@ class Measurements:
 
                 if measurement["type"] == "distance":
 
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+
                     self.results[measurement["name"]].append(
                         distance(
                             measurement["sel"][0],
@@ -606,6 +625,8 @@ class Measurements:
                     )
 
                 elif measurement["type"] == "dihedral":
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
 
                     self.results[measurement["name"]].append(
                         dihedral(
@@ -619,7 +640,9 @@ class Measurements:
                     )
 
                 elif measurement["type"] == "angle":
-
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
                     self.results[measurement["name"]].append(
                         angle(
                             measurement["sel"][0],
@@ -631,7 +654,9 @@ class Measurements:
                     )
 
                 elif measurement["type"] == "planar_angle":
-
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
                     self.results[measurement["name"]].append(
                         planar_angle(
                             plane_A=measurement["sel"][0].positions,
@@ -642,7 +667,9 @@ class Measurements:
                     )
 
                 elif measurement["type"] == "contacts":
-
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
                     if measurement["mode"] == "selection":
                         self.results[measurement["name"]].append(contacts_selection(
                             sel= measurement["sel"][0],
@@ -652,13 +679,23 @@ class Measurements:
                             measure_distances= measurement["options"]["measure_dists"],
                         ))
 
-                    if measurement["type"] == "protein":
-
+                    if measurement["mode"] == "protein":
+                        print('I am calculating')
+                        self.results[measurement["name"]].append(contacts_protein(
+                            sel= measurement["sel"][0],
+                            sel_env= measurement["sel"][1],
+                            interactions= measurement["options"]["interactions"],
+                            out_format= measurement["options"]["out_format"],
+                            measure_distances= measurement["options"]["measure_dists"],
+                        ))
 
                     else :
                         pass
 
                 elif measurement["type"] == "distWATbridge":
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
                     if (
                         "WAT" not in measurement["sel"][2].resnames
                         or "WAT" not in measurement["sel"][3].resnames
@@ -738,6 +775,10 @@ class Measurements:
                         del selWAT, closestWAT, dist1_, dist1, dist2_, dist2
 
                 elif measurement["type"] == "rmsd":
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
+
                     if measurement["options"]["superposition"] == True:
 
                         self.results[measurement["name"]].append(
@@ -761,7 +802,9 @@ class Measurements:
                         )
 
                 elif measurement["type"] == 'pka':
-
+                    if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
+                        del self.results[measurement["name"]]
+                        
                     if first:
                         check_folder(measurement["options"]["pdb_folder"])
 
@@ -776,7 +819,8 @@ class Measurements:
                         )
                     )
 
-        first = False
+        if first:
+            first = False
 
         if save_output != False:
 
