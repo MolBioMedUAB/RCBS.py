@@ -2,6 +2,10 @@ from MDAnalysis.core.groups import AtomGroup
 import MDAnalysis.lib.distances as mdadist
 import MDAnalysis.analysis.rms as rms
 
+from ..exceptions import (
+    NotExistingInteraction,
+)
+
 from ..snippets import check_folder
 
 from subprocess import run as run_command
@@ -186,7 +190,7 @@ def angle(
             return a
         
 
-def  pka(
+def pka(
         sel_protein,            # whole protein AtomGroup for saving PDB
         #sel_pka=None,           # optional selection for checking only the pKa of the selected resids
         pka_ref='neutral',  
@@ -245,6 +249,32 @@ def  pka(
     return pkas
 
 
+def contacts_selection(
+        sel,
+        sel_env,
+        interactions,
+        measure_distances=False,
+        out_format='new',
+):
 
+    residues = []
+    for name, id in zip(sel_env.resnames, sel_env.resids):
+        if {"name" : name, "id" : id} not in residues:
+            residues.append({"name" : name, "id" : id})
 
+    contacts = {}
+
+    for r in range(len(residues)):
+        if residues[r]["id"] not in sel.residues.resindices: #residue[1] is the residue's number
+            if residues[r]["name"] in interactions:
+                if out_format == 'old':
+                    contacts[residues[r]['id']] = residues[r]['name']
+                
+                elif out_format == 'new':
+                    if measure_distances:
+                        contacts[residues[r]['name'] + str(residues[r]['id'])] = distance(sel, sel_env.residues[r].atoms, type='min')
+                    elif not measure_distances:
+                        contacts[residues[r]['name'] + str(residues[r]['id'])] = None
+
+    return contacts
 

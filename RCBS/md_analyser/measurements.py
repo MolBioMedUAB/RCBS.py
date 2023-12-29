@@ -212,26 +212,28 @@ class Measurements:
             }
         )
 
-    def add_contacts(self, name, sel, sel_env=3, interactions="all", include_WAT=False):
+    def add_contacts(self, name, sel, sel_env=3, interactions="all", include_WAT=False, out_format='new', measure_distances=True):
         """
         DESCRIPTION:
             This function takes a Universe, a selection and a radius and returns the list of residues nearer than the specified radius.
 
         INPUT:
             - Name of the measurement
-            - u            -> MDAnalysis Universe
-            - sel          -> selection of central atoms. It has to be an AtomGroup
+            - sel          -> selection of central atoms. It has to be an AtomGroup (only option for old engine) or the 'protein' string for 
+                              measuring distances between all contacting residues
             - sel_env      -> radius (in ang)
             - interactions -> type of interactions to be considered (all, polar, nonpolar, donorHbond, none). Custom
                               interactions can be also analysed by passing a list of residues names
+            - out_format   -> [ '0.3'/'new'/'n' | '0.2'/'old'/'o' ] Format of the output. 'old' corresponds to the old logics (versions 0.0 to 0.2)
+                              and is kept for compatibility reasons.
 
         OUTPUT:
             - List of dictionaries containing the name and number of all interacting residues
         """
 
-        sel_env = self.universe.select_atoms(
-            "around %s group select" % sel_env, select=sel, updating=True
-        )
+        #sel_env = self.universe.select_atoms(
+        #    "around %s group select" % sel_env, select=sel, updating=True
+        #)
 
         if isinstance(interactions, str):
             if interactions not in ("all", "polar", "nonpolar", "donorHbond", "none"):
@@ -267,6 +269,7 @@ class Measurements:
                         "TYR",
                         "VAL",
                     ]
+
                 elif interactions == "polar":
                     interactions = [
                         "ARG",
@@ -331,19 +334,54 @@ class Measurements:
 
             pass
 
-        if include_WAT == True:
-            interactions += ["WAT"]
+        else :
+            raise NotExistingInteraction
+        
 
-        self.measurements.append(
+        if include_WAT == True:
+            interactions += ["WAT", "HOH"]
+
+        if isinstance(sel, AtomGroup):
+            mode = 'selection'
+
+            sel_env = self.universe.select_atoms(
+                "around %s group select" % str(sel_env), select=sel, updating=True
+            )
+
+            if str(out_format).lower() in ['0.2', 'old', 'o']:
+                out_format = 'old'
+                if measure_distances:
+                    print("Distances can not been calculated using the old output format. \
+                          'measure_distances' has been set to False.")
+                    
+            elif str(out_format).lower() in ['0.3', 'new', 'n']:
+                out_format = 'new'
+
+            else :
+                print('The selected out format does not exist. The new format has been selected instead.')
+                out_format = 'new'
+
+            self.measurements.append(
             {
                 "name": name,
-                "type": "contacts",
+                "type" : "contacts",
+                "mode": mode,
                 "sel": [sel, sel_env],
                 "options": {
-                    "interactions": interactions,
+                    "interactions"  : interactions,
+                    "measure_dists" : measure_distances,
+                    "out_format"    : out_format
                 },
             }
-        )
+            )
+
+        if isinstance(sel, str) and sel.lower() == 'protein':
+            mode = 'protein'
+            sel = self.universe.select_atoms('protein')
+
+
+
+
 
     def add_RMSD(self, name, sel, ref=None, superposition=True):
         """
@@ -604,22 +642,21 @@ class Measurements:
                     )
 
                 elif measurement["type"] == "contacts":
-                    names = list(measurement["sel"][1].resnames)
-                    ids = list(measurement["sel"][1].resids)
 
-                    dict_ = {}
+                    if measurement["mode"] == "selection":
+                        self.results[measurement["name"]].append(contacts_selection(
+                            sel= measurement["sel"][0],
+                            sel_env= measurement["sel"][1],
+                            interactions= measurement["options"]["interactions"],
+                            out_format= measurement["options"]["out_format"],
+                            measure_distances= measurement["options"]["measure_dists"],
+                        ))
 
-                    for i in range(len(ids)):
-                        if ids[i] not in measurement["sel"][0].residues.resindices:
-                            if str(names[i]) in measurement["options"]["interactions"]:
-                                dict_[int(ids[i])] = names[i]
+                    if measurement["type"] == "protein":
 
-                    #                    for i, n in zip(ids, names):
-                    #                        if i not in measurement["sel"][1].residues.resindices:
-                    #                            if str(n)[:3] in measurement["options"]["interactions"]:
-                    #                                dict_[int(str(i))] = n
 
-                    self.results[measurement["name"]].append(dict_)
+                    else :
+                        pass
 
                 elif measurement["type"] == "distWATbridge":
                     if (
