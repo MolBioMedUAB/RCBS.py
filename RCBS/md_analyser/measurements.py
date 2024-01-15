@@ -608,7 +608,7 @@ class Measurements:
 
         first = True
         for ts in tqdm(self.universe.trajectory[first-1:last:step], desc="Analysing", unit="frames"):
-
+            print(first)
             for measurement in self.measurements:
 
                 if measurement["type"] == "distance":
@@ -818,8 +818,8 @@ class Measurements:
                         )
                     )
 
-        if first:
-            first = False
+            if first:
+                first = False
 
         if save_output != False:
 
