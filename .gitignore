@@ -10,3 +10,4 @@ __pycache__/
 RCBS.code-workspace
 notes/
 RCBS/examples/md_analyser/trajectory_analysis_and_frame_extraction_testing.ipynb
+examples/trajectory_analysis_and_frame_extraction_testing.ipynb
