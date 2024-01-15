@@ -614,7 +614,7 @@ class Measurements:
                 if measurement["type"] == "distance":
 
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
 
                     self.results[measurement["name"]].append(
                         distance(
@@ -626,7 +626,7 @@ class Measurements:
 
                 elif measurement["type"] == "dihedral":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
 
                     self.results[measurement["name"]].append(
                         dihedral(
@@ -641,7 +641,7 @@ class Measurements:
 
                 elif measurement["type"] == "angle":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
                     self.results[measurement["name"]].append(
                         angle(
@@ -655,7 +655,7 @@ class Measurements:
 
                 elif measurement["type"] == "planar_angle":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
                     self.results[measurement["name"]].append(
                         planar_angle(
@@ -668,7 +668,7 @@ class Measurements:
 
                 elif measurement["type"] == "contacts":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
                     if measurement["mode"] == "selection":
                         self.results[measurement["name"]].append(contacts_selection(
@@ -680,7 +680,6 @@ class Measurements:
                         ))
 
                     if measurement["mode"] == "protein":
-                        print('I am calculating')
                         self.results[measurement["name"]].append(contacts_protein(
                             sel= measurement["sel"][0],
                             sel_env= measurement["sel"][1],
@@ -694,7 +693,7 @@ class Measurements:
 
                 elif measurement["type"] == "distWATbridge":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
                     if (
                         "WAT" not in measurement["sel"][2].resnames
@@ -776,7 +775,7 @@ class Measurements:
 
                 elif measurement["type"] == "rmsd":
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
 
                     if measurement["options"]["superposition"] == True:
@@ -803,7 +802,7 @@ class Measurements:
 
                 elif measurement["type"] == 'pka':
                     if measurement["name"] in self.results and previous_measurements.lower() in ['ow', 'overwrite'] and first:
-                        del self.results[measurement["name"]]
+                        self.results[measurement["name"]] = []
                         
                     if first:
                         check_folder(measurement["options"]["pdb_folder"])

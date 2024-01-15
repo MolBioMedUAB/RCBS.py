@@ -122,7 +122,7 @@ def dihedral(
     """
     DESCRIPTION
         Function that calculates the dihedral angle between four atoms.
-        Dihedral angle is calculated by calculating the planar angle of the planes builds by the sel1, sel2, sel3 and sel2, sel3, sel4.
+        Dihedral angle is calculated by measuring the planar angle of the planes builds by the sel1, sel2, sel3 and sel2, sel3, sel4.
 
     OPTIONS (as arguments)
         - units: radians (rad) or degrees (deg)
