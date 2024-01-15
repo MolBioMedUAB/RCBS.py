@@ -378,8 +378,6 @@ class Measurements:
             )
 
         if isinstance(sel, str) and sel.lower() == 'protein':
-            print('hey')
-            
             mode = 'protein'
             #sel = self.universe.select_atoms('protein')
             sel = self.universe.select_atoms('all')
@@ -608,7 +606,7 @@ class Measurements:
 
         first = True
         for ts in tqdm(self.universe.trajectory[first-1:last:step], desc="Analysing", unit="frames"):
-            print(first)
+
             for measurement in self.measurements:
 
                 if measurement["type"] == "distance":
