@@ -32,7 +32,7 @@ pip install RCBS.py
     ```
 3. Install the package using pip or pip3
     ```bash
-    pip install RCBS.py
+    pip install .
     ```
 
 ## Usage
